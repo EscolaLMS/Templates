@@ -19,12 +19,12 @@ use Illuminate\Database\Eloquent\Model;
  *         property="course_id",
  *         type="integer",
  *         description="identifier of the course"
- *     ), 
+ *     ),
  *     @OA\Property(
  *         property="user_id",
  *         type="integer",
  *         description="identifier of the user"
- *     ), 
+ *     ),
  *     @OA\Property(
  *          property="path",
  *          type="string",
@@ -61,7 +61,8 @@ class Certificate extends Model
         'status' => 'string',
         'path' => 'string',
         'course_id' => 'integer',
-        'user_id' => 'string',
+        'user_id' => 'integer',
+        'template_id' => 'integer'
     ];
 
     public $fillable = [
@@ -70,6 +71,7 @@ class Certificate extends Model
         'path',
         'course_id',
         'user_id',
+        'template_id',
     ];
 
     /**

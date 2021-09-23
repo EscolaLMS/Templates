@@ -34,9 +34,11 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
 
     private function loadListeners()
     {
-        Event::listen(queueable(function (CourseCompleted $event) {
-            ProcessCertificate::dispatch($event->getCourse(), $event->getVideo());
-        }));
+        Event::listen(function (CourseCompleted $event) {
+            $course_id = $event->getCourse()->id;
+            $user_id = $event->getUser()->id;
+            ProcessCertificate::dispatch($course_id, $user_id);
+        });
     }
 
     public function boot()
