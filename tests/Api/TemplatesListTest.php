@@ -47,41 +47,4 @@ class TemplatesListTest extends TestCase
             $templatesArr[0],
         );
     }
-
-    public function testAnonymousCanListEmpty()
-    {
-        Template::truncate();
-
-        $this->authenticateAsAdmin();
-
-        $response = $this->getJson('/api/templates');
-        $response->assertOk();
-        $response->assertJsonStructure([
-            'success',
-            'data',
-            'meta',
-            'message'
-        ]);
-        $response->assertJsonCount(0, 'data');
-    }
-
-    public function testAnonymousCanList()
-    {
-        $this->authenticateAsAdmin();
-
-        $templates = Template::factory()
-            ->count(10)
-            ->create(['active' => true]);
-
-        $templatesArr = $templates->map(function (Template $p) {
-            return $p->toArray();
-        })->values()->toArray();
-
-
-        $response = $this->getJson('/api/templates');
-        $response->assertOk();
-        $response->assertJsonFragment(
-            $templatesArr[0]
-        );
-    }
 }

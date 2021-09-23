@@ -10,18 +10,9 @@ class TemplatesReadTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private function uri(string $slug): string
+    private function uri(string $suffix): string
     {
-        return sprintf('/api/templates/%s', $slug);
-    }
-
-    public function testCanReadExisting()
-    {
-        $template = Template::factory()->createOne();
-
-        $response = $this->getJson($this->uri($template->slug));
-        $response->assertOk();
-        $response->assertJsonFragment(collect($template->getAttributes())->except('id', 'slug')->toArray());
+        return sprintf('/api/templates/%s', $suffix);
     }
 
     public function testCannotFindMissing()
@@ -38,6 +29,6 @@ class TemplatesReadTest extends TestCase
 
         $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates/' . $template->getKey());
         $response->assertOk();
-        $response->assertJsonFragment(collect($template->getAttributes())->except('id', 'slug')->toArray());
+        $response->assertJsonFragment(collect($template->getAttributes())->except('id', 'created_at', 'updated_at')->toArray());
     }
 }

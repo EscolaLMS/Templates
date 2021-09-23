@@ -96,7 +96,7 @@ class TemplatesUpdateTest extends TestCase
         );
 
         $response->assertStatus(404);
-        $this->assertEquals(0, $template->newQuery()->where('slug', $template->slug)->count());
+        $this->assertEquals(0, $template->newQuery()->where('id', $template->id)->count());
     }
 
     public function testGuestCannotUpdateExistingTemplate()

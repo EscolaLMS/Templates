@@ -23,7 +23,7 @@ class TemplatesDeleteTest extends TestCase
         $template = Template::factory()->createOne();
         $response = $this->actingAs($this->user, 'api')->delete($this->uri($template->id));
         $response->assertOk();
-        $this->assertEquals(0, Template::factory()->make()->newQuery()->where('slug', $template->slug)->count());
+        $this->assertEquals(0, Template::factory()->make()->newQuery()->where('id', $template->id)->count());
     }
 
     public function testAdminCannotDeleteMissingTemplate()

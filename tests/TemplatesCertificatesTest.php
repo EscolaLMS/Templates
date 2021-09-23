@@ -7,7 +7,7 @@ use EscolaLms\Templates\Repository\TemplateRepository;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class TemplatesVariablesTest extends TestCase
+class TemplatesCertificatesTest extends TestCase
 {
     use DatabaseTransactions;
 
@@ -15,6 +15,6 @@ class TemplatesVariablesTest extends TestCase
     {
         // TODO write this test
 
-        $this->assetTrue(true);
+        $this->assertTrue(true);
     }
 }
