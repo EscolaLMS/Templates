@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Schema(
  *     schema="Template",
- *     required={"title","author_id","content"},
+ *     required={"name","type","vars_set","content"},
  *     @OA\Property(
  *          property="name",
  *          type="string",

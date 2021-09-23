@@ -18,6 +18,8 @@ class PermissionTableSeeder extends Seeder
         $apiAdmin = Role::findOrCreate('admin', 'api');
         $permissions = ['delete templates', 'create templates', 'update templates'];
 
+        // TODO this should also include "list" and "updateOwn" 
+
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'api');
         }

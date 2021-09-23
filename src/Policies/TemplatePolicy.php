@@ -10,6 +10,8 @@ class TemplatePolicy
 {
     use HandlesAuthorization;
 
+    // TODO this should also include "list" and "updateOwn" 
+
     /**
      * @param User $user
      * @return bool

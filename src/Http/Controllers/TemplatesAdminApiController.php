@@ -11,24 +11,18 @@ use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Resources\TemplateResource;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
-// use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use EscolaLms\Templates\Models\Template;
-
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-
-use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
-    // private VariablesServiceContract $variableService;
 
-    public function __construct(TemplateServiceContract $templateService /* , VariablesServiceContract $variableService */)
+    public function __construct(TemplateServiceContract $templateService )
     {
         $this->templateService = $templateService;
-        // $this->variableService = $variableService;
     }
 
     public function list(TemplateListingRequest $request): JsonResponse
