@@ -17,6 +17,7 @@ class TemplateFactory extends Factory
         return [
             'name' => Str::slug($title, '-'),
             'type' => 'pdf',
+            'vars_set' => 'certificates',
             'content' => '<h1>This is a template</h1>',
         ];
     }

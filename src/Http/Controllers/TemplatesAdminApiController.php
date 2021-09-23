@@ -11,17 +11,24 @@ use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Resources\TemplateResource;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
+// use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Models\Template;
+
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
+    // private VariablesServiceContract $variableService;
 
-    public function __construct(TemplateServiceContract $templateService)
+    public function __construct(TemplateServiceContract $templateService /* , VariablesServiceContract $variableService */)
     {
         $this->templateService = $templateService;
+        // $this->variableService = $variableService;
     }
 
     public function list(TemplateListingRequest $request): JsonResponse
@@ -88,23 +95,23 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     public function variables(TemplateReadRequest $request): JsonResponse
     {
 
-        // TODO handle this somehow 
-
-        //  move this with faker to enum class 
-        $vars = [
-            "@VarDateFinished",
-            "@VarStudentFirstName",
-            "@VarStudentLastName",
-            "@VarStudentFullName",
-            "@VarTutorFirstName",
-            "@VarTutorLastName",
-            "@VarTutorFullName",
-            "@VarCourseName"
-        ];
+        $vars = $this->variableService->getAvailableTokens();
 
         try {
-
             return $this->sendResponse($vars, "template vars fetched successfully");
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+    public function preview(TemplateReadRequest $request, $id): Response
+    {
+        $template = Template::findOrFail($id);
+
+        $filepath = $this->templateService->createPreview($template);
+
+        try {
+            return response()->file(public_path($filepath));
         } catch (Exception $e) {
             return $this->sendError($e->getMessage());
         }

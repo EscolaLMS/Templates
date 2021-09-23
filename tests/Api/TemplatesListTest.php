@@ -1,24 +1,24 @@
 <?php
 
-namespace EscolaLms\Pages\Tests\Api;
+namespace EscolaLms\Templates\Tests\Api;
 
-use EscolaLms\Pages\Models\Page;
-use EscolaLms\Pages\Tests\TestCase;
+use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class PagesListTest extends TestCase
+class TemplatesListTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private string $uri = '/api/pages';
+    private string $uri = '/api/templates';
 
     public function testAdminCanListEmpty()
     {
-        Page::truncate();
+        Template::truncate();
 
         $this->authenticateAsAdmin();
 
-        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/pages');
+        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates');
         $response->assertOk();
         $response->assertJsonStructure([
             'success',
@@ -33,28 +33,28 @@ class PagesListTest extends TestCase
     {
         $this->authenticateAsAdmin();
 
-        $pages = Page::factory()
+        $templates = Template::factory()
             ->count(10)
             ->create();
 
-        $pagesArr = $pages->map(function (Page $p) {
+        $templatesArr = $templates->map(function (Template $p) {
             return $p->toArray();
         })->toArray();
 
-        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/pages');
+        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates');
         $response->assertOk();
         $response->assertJsonFragment(
-            $pagesArr[0],
+            $templatesArr[0],
         );
     }
 
     public function testAnonymousCanListEmpty()
     {
-        Page::truncate();
+        Template::truncate();
 
         $this->authenticateAsAdmin();
 
-        $response = $this->getJson('/api/pages');
+        $response = $this->getJson('/api/templates');
         $response->assertOk();
         $response->assertJsonStructure([
             'success',
@@ -69,19 +69,19 @@ class PagesListTest extends TestCase
     {
         $this->authenticateAsAdmin();
 
-        $pages = Page::factory()
+        $templates = Template::factory()
             ->count(10)
             ->create(['active' => true]);
 
-        $pagesArr = $pages->map(function (Page $p) {
+        $templatesArr = $templates->map(function (Template $p) {
             return $p->toArray();
         })->values()->toArray();
 
 
-        $response = $this->getJson('/api/pages');
+        $response = $this->getJson('/api/templates');
         $response->assertOk();
         $response->assertJsonFragment(
-            $pagesArr[0]
+            $templatesArr[0]
         );
     }
 }

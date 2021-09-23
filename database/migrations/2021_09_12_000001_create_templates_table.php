@@ -15,10 +15,12 @@ class CreateTemplatesTable extends Migration
             $this->table,
             function (Blueprint $table) {
                 $table->id('id');
-                $table->string('name');
-                $table->string('type');
-                $table->foreignIdFor(Course::class, 'cours_id')->nullable();
+                $table->string('name'); 
+                $table->string('type'); // PDF, email, notification
+                $table->string('vars_set')->default('certificates'); // certificates, email_ceortificate, whatever
+                $table->foreignIdFor(Course::class, 'course_id')->nullable();
                 $table->longText('content');
+                $table->timestamps();
             }
         );
     }

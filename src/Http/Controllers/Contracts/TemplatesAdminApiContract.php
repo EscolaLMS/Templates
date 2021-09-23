@@ -8,6 +8,7 @@ use EscolaLms\Templates\Http\Requests\TemplateListingRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 interface TemplatesAdminApiContract
 {
@@ -233,4 +234,45 @@ interface TemplatesAdminApiContract
      * @return JsonResponse
      */
     public function read(TemplateReadRequest $request, int $id): JsonResponse;
+
+
+        /**
+     * @OA\Get(
+     *     path="/api/admin/templates/{id}",
+     *     summary="Read a template identified by a given id identifier",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Unique human-readable template identifier",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="PDF with faker",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateListingRequest $request
+     * @return Response
+     */
+    public function preview(TemplateReadRequest $request, int $id): Response;
 }

@@ -28,6 +28,7 @@ class TemplateCreateRequest extends FormRequest
     {
         return [
             'type' => 'string',
+            'vars_set' => 'string',
             'name' => 'string|required',
             'content' => 'string|required',
             'course_id' => 'integer|exists:courses'

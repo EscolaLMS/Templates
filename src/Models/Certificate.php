@@ -3,51 +3,51 @@
 namespace EscolaLms\Templates\Models;
 
 use EscolaLms\Courses\Models\Course;
+use EscolaLms\Auth\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="Template",
- *     required={"title","author_id","content"},
+ *     schema="Certificate",
  *     @OA\Property(
- *          property="name",
- *          type="string",
- *          description="name "
+ *          property="id",
+ *          type="integer",
+ *          description="id "
  *     ),
  *     @OA\Property(
  *         property="course_id",
  *         type="integer",
- *         description="identifier oftcourse"
+ *         description="identifier of the course"
  *     ), 
  *     @OA\Property(
- *          property="type",
+ *         property="user_id",
+ *         type="integer",
+ *         description="identifier of the user"
+ *     ), 
+ *     @OA\Property(
+ *          property="path",
  *          type="string",
- *          description="type (Certificate, email, etc)"
+ *          description="path"
  *     ),
  *     @OA\Property(
- *          property="vars_set",
+ *          property="status",
  *          type="string",
- *          description="avaliable vars (Certificate, email account confirm, etc)"
- *     ),
- *     @OA\Property(
- *          property="content",
- *          type="string",
- *          description="template content"
+ *          description="queue status"
  *     )
  * )
  *
  * @property integer $id
- * @property string $name
- * @property string $type
  * @property integer $course_id
- * @property string $content
+ * @property integer $user_id
+ * @property string $status
+ * @property string $path
  */
-class Template extends Model
+class Certificate extends Model
 {
     use HasFactory;
 
-    public $table = 'templates';
+    public $table = 'certificates';
 
     /**
      * The attributes that should be casted to native types.
@@ -58,19 +58,18 @@ class Template extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'name' => 'string',
-        'type' => 'string',
-        'vars_set' => 'string',
+        'status' => 'string',
+        'path' => 'string',
         'course_id' => 'integer',
-        'content' => 'string',
+        'user_id' => 'string',
     ];
 
     public $fillable = [
         'name',
-        'type',
-        'vars_set',
+        'status',
+        'path',
         'course_id',
-        'content'
+        'user_id',
     ];
 
     /**
@@ -79,5 +78,13 @@ class Template extends Model
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

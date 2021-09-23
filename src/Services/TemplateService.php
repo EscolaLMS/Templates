@@ -7,14 +7,19 @@ use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Spatie\Browsershot\Browsershot;
+use EscolaLms\Templates\Models\Certificate;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 
 class TemplateService implements TemplateServiceContract
 {
     private TemplateRepositoryContract $repository;
+    private VariablesServiceContract $variableService;
 
-    public function __construct(TemplateRepositoryContract $repository)
+    public function __construct(TemplateRepositoryContract $repository, VariablesServiceContract $variableService)
     {
         $this->repository = $repository;
+        $this->variableService = $variableService;
     }
 
     public function search(array $search = []): LengthAwarePaginator
@@ -47,5 +52,35 @@ class TemplateService implements TemplateServiceContract
     public function update(int $id, array $data): Template
     {
         return $this->repository->update($data, $id);
+    }
+
+    public function createPreview(Template $template): string
+    {
+        switch ($template->vars_set) {
+            case "certificates":
+                $vars = $this->variableService->getMockVariables(Certificate::class);
+                break;
+            default:
+                $vars = [];
+        }
+
+        $content = strtr($template->content, $vars);
+        $content = view('templates::ckeditor', ['body' => $content])->render();
+
+        $filename = 'preview-' . uniqid() . '.pdf';
+
+        Browsershot::html($content)
+            ->addChromiumArguments([
+                'no-sandbox',
+                'disable-setuid-sandbox',
+                'disable-dev-shm-usage',
+                'single-process'
+            ])
+            ->timeout(120)
+            ->save($filename);
+
+        // Add this file to delete queue 
+
+        return $filename;
     }
 }

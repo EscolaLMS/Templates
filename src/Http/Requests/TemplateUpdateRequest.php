@@ -27,6 +27,7 @@ class TemplateUpdateRequest extends FormRequest
     {
         return [
             'type' => 'string',
+            'vars_set' => 'string',
             'name' => 'string',
             'content' => 'string',
             'course_id' => 'integer|exists:courses'

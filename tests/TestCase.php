@@ -1,11 +1,11 @@
 <?php
 
-namespace EscolaLms\Pages\Tests;
+namespace EscolaLms\Templates\Tests;
 
 use EscolaLms\Core\Models\User;
-use EscolaLms\Pages\AuthServiceProvider;
-use EscolaLms\Pages\Database\Seeders\PermissionTableSeeder;
-use EscolaLms\Pages\EscolaLmsPagesServiceProvider;
+use EscolaLms\Templates\AuthServiceProvider;
+use EscolaLms\Templates\Database\Seeders\PermissionTableSeeder;
+use EscolaLms\Templates\EscolaLmsTemplatesServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\PassportServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
@@ -26,7 +26,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         return [
             ...parent::getPackageProviders($app),
-            EscolaLmsPagesServiceProvider::class,
+            EscolaLmsTemplatesServiceProvider::class,
             PassportServiceProvider::class,
             PermissionServiceProvider::class,
             AuthServiceProvider::class
@@ -42,8 +42,8 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
-        $this->user->givePermissionTo('create pages');
-        $this->user->givePermissionTo('update pages');
-        $this->user->givePermissionTo('delete pages');
+        $this->user->givePermissionTo('create templates');
+        $this->user->givePermissionTo('update templates');
+        $this->user->givePermissionTo('delete templates');
     }
 }

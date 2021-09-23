@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], function () {
     Route::get('/variables', [TemplatesAdminApiController::class, 'variables']);
-    Route::get('/{id}/preview', PreviewController::class);
+    Route::get('/{id}/preview', [TemplatesAdminApiController::class, 'preview']);
     Route::get('/', [TemplatesAdminApiController::class, 'list']);
     Route::get('/{id}', [TemplatesAdminApiController::class, 'read']);
     Route::post('/', [TemplatesAdminApiController::class, 'create']);

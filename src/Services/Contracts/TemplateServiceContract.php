@@ -20,4 +20,7 @@ interface TemplateServiceContract
     public function deleteById(int $id): bool;
 
     public function update(int $id, array $data): Template;
+
+    public function createPreview(Template $template) : string;
+
 }
