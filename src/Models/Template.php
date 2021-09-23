@@ -5,7 +5,7 @@ namespace EscolaLms\Templates\Models;
 use EscolaLms\Courses\Models\Course;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use EscolaLms\Templates\Database\Factories\TemplateFactory;
 /**
  * @OA\Schema(
  *     schema="Template",
@@ -79,5 +79,15 @@ class Template extends Model
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return TemplateFactory::new();
     }
 }
