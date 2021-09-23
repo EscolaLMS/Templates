@@ -1,11 +1,7 @@
 <?php
 
-use EscolaLms\Templates\Http\Controllers\Admin\PreviewController;
 use EscolaLms\Templates\Http\Controllers\TemplatesAdminApiController;
-
 use Illuminate\Support\Facades\Route;
-
-
 
 Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], function () {
     Route::get('/variables', [TemplatesAdminApiController::class, 'variables']);

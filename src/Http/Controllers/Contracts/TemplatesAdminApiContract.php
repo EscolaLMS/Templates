@@ -236,6 +236,47 @@ interface TemplatesAdminApiContract
     public function read(TemplateReadRequest $request, int $id): JsonResponse;
 
 
+      /**
+     * @OA\Get(
+     *     path="/api/admin/templates/variables",
+     *     summary="Dictionary list of available template variables",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Unique human-readable template identifier",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateListingRequest $request
+     * @return JsonResponse
+     */
+    public function variables(TemplateReadRequest $request): JsonResponse;
+
+
         /**
      * @OA\Get(
      *     path="/api/admin/templates/{id}",
