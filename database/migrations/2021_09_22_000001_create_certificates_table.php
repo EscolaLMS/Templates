@@ -14,7 +14,6 @@ class CreateCertificatesTable extends Migration
 
     public function up()
     {
-
         Schema::create(
             $this->table,
             function (Blueprint $table) {
@@ -22,7 +21,7 @@ class CreateCertificatesTable extends Migration
                 $table->string('path')->nullable();
                 $table->enum('status', ['pending', 'processing', 'finished', 'failed'])->default('pending');
                 $table->foreignIdFor(Course::class, 'course_id');
-                $table->foreignIdFor(User::class, 'cours_id');
+                $table->foreignIdFor(User::class, 'user_id');
                 $table->foreignIdFor(Template::class, 'template_id');
                 $table->timestamps();
             }

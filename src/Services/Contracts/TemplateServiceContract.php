@@ -23,4 +23,5 @@ interface TemplateServiceContract
 
     public function createPreview(Template $template) : string;
 
+    public function generatePDF(Template $template, array $vars): string;
 }

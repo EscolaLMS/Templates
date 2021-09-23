@@ -54,6 +54,23 @@ class TemplateService implements TemplateServiceContract
         return $this->repository->update($data, $id);
     }
 
+    public function generatePDF(Template $template, array $vars): string
+    {
+        $content = strtr($template->content, $vars);
+        $content = view('templates::ckeditor', ['body' => $content])->render();
+        $filename = 'generated-' . uniqid() . '.pdf';
+        Browsershot::html($content)
+            ->addChromiumArguments([
+                'no-sandbox',
+                'disable-setuid-sandbox',
+                'disable-dev-shm-usage',
+                'single-process'
+            ])
+            ->timeout(120)
+            ->save($filename);
+        return $filename;
+    }
+
     public function createPreview(Template $template): string
     {
         switch ($template->vars_set) {
@@ -79,7 +96,7 @@ class TemplateService implements TemplateServiceContract
             ->timeout(120)
             ->save($filename);
 
-        // Add this file to delete queue 
+        // Add this file to delete queue
 
         return $filename;
     }
