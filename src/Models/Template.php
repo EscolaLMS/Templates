@@ -6,6 +6,7 @@ use EscolaLms\Courses\Models\Course;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use EscolaLms\Templates\Database\Factories\TemplateFactory;
+
 /**
  * @OA\Schema(
  *     schema="Template",
@@ -15,11 +16,6 @@ use EscolaLms\Templates\Database\Factories\TemplateFactory;
  *          type="string",
  *          description="name "
  *     ),
- *     @OA\Property(
- *         property="course_id",
- *         type="integer",
- *         description="identifier oftcourse"
- *     ), 
  *     @OA\Property(
  *          property="type",
  *          type="string",
@@ -40,7 +36,6 @@ use EscolaLms\Templates\Database\Factories\TemplateFactory;
  * @property integer $id
  * @property string $name
  * @property string $type
- * @property integer $course_id
  * @property string $content
  */
 class Template extends Model
@@ -61,7 +56,6 @@ class Template extends Model
         'name' => 'string',
         'type' => 'string',
         'vars_set' => 'string',
-        'course_id' => 'integer',
         'content' => 'string',
     ];
 
@@ -69,17 +63,9 @@ class Template extends Model
         'name',
         'type',
         'vars_set',
-        'course_id',
         'content'
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function course()
-    {
-        return $this->belongsTo(Course::class, 'course_id');
-    }
 
     /**
      * Create a new factory instance for the model.

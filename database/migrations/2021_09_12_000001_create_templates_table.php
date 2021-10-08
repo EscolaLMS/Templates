@@ -18,7 +18,6 @@ class CreateTemplatesTable extends Migration
                 $table->string('name'); 
                 $table->string('type'); // PDF, email, notification
                 $table->string('vars_set')->default('certificates'); // certificates, email_ceortificate, whatever
-                $table->foreignIdFor(Course::class, 'course_id')->nullable();
                 $table->longText('content');
                 $table->timestamps();
             }
