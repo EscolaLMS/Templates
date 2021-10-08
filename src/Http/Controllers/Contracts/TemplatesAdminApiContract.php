@@ -279,7 +279,7 @@ interface TemplatesAdminApiContract
 
         /**
      * @OA\Get(
-     *     path="/api/admin/templates/{id}",
+     *     path="/api/admin/templates/{id}/preview_email",
      *     summary="Read a template identified by a given id identifier",
      *     tags={"Templates"},
      *     security={
@@ -315,5 +315,45 @@ interface TemplatesAdminApiContract
      * @param TemplateListingRequest $request
      * @return Response
      */
-    public function preview(TemplateReadRequest $request, int $id): Response;
+    public function previewEmail(TemplateReadRequest $request, int $id): Response;
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/templates/{id}/preview_pdf",
+     *     summary="Read a template identified by a given id identifier",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Unique human-readable template identifier",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="PDF with faker",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateListingRequest $request
+     * @return Response
+     */
+    public function previewPdf(TemplateReadRequest $request, int $id): Response;
 }

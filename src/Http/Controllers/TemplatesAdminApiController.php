@@ -20,12 +20,12 @@ use Exception;
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
-    private VariablesServiceContract $variableService;
+    private VariablesServiceContract $variablesService;
 
-    public function __construct(TemplateServiceContract $templateService, VariablesServiceContract $variableService)
+    public function __construct(TemplateServiceContract $templateService, VariablesServiceContract $variablesService)
     {
         $this->templateService = $templateService;
-        $this->variableService = $variableService;
+        $this->variablesService = $variablesService;
     }
 
     public function list(TemplateListingRequest $request): JsonResponse
@@ -91,7 +91,7 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
     public function variables(TemplateReadRequest $request): JsonResponse
     {
-        $vars = $this->variableService->getAvailableTokens();
+        $vars = $this->variablesService->getAvailableTokens();
 
         try {
             return $this->sendResponse($vars, "template vars fetched successfully");
@@ -100,7 +100,20 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         }
     }
 
-    public function preview(TemplateReadRequest $request, $id): Response
+    public function previewPdf(TemplateReadRequest $request, $id): Response
+    {
+        $template = Template::findOrFail($id);
+
+        $filepath = $this->templateService->createPreview($template);
+
+        try {
+            return response()->file(public_path($filepath));
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+    public function previewEmail(TemplateReadRequest $request, $id): Response
     {
         $template = Template::findOrFail($id);
 

@@ -6,8 +6,9 @@ use EscolaLms\Core\Enums\BasicEnum;
 
 use EscolaLms\Courses\Models\Course;
 use EscolaLms\Auth\Models\User;
+use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
 
-class CertificateVar extends BasicEnum
+class CertificateVar extends BasicEnum implements TemplateVariableContract
 {
     const DATE_FINISHED         = "@VarDateFinished";
     const STUDENT_FIRST_NAME    = "@VarStudentFirstName";
@@ -19,7 +20,7 @@ class CertificateVar extends BasicEnum
     const COURSE_TITLE          = "@VarCourseTitle";
 
 
-    public static function getMockVariables()
+    public static function getMockVariables() : array
     {
 
         $faker = \Faker\Factory::create();
@@ -35,7 +36,7 @@ class CertificateVar extends BasicEnum
         ];
     }
 
-    public static function getVariablesFromContent(Course $course, User $user)
+    public static function getVariablesFromContent(Course $course = null, User $user = null) : array
     {
         return [
             self::DATE_FINISHED => date("Y-m-d H:i:s"), // TODO how to get this date from progress? 
