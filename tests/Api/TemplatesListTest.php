@@ -14,7 +14,6 @@ class TemplatesListTest extends TestCase
 
     public function testAdminCanListEmpty()
     {
-        Template::truncate();
 
         $this->authenticateAsAdmin();
 
