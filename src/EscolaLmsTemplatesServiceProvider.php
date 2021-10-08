@@ -37,7 +37,7 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
         Event::listen(function (CourseCompleted $event) {
             $course_id = $event->getCourse()->id;
             $user_id = $event->getUser()->id;
-            ProcessCertificate::dispatch($course_id, $user_id);
+            // ProcessCertificate::dispatch($course_id, $user_id);
         });
     }
 

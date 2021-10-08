@@ -18,4 +18,7 @@ interface VariablesServiceContract
 
     public function getMockVariables(string $className): array;
 
+    public function getVariableEnumClassName($type, $vars_set): string;
+
+
 }

@@ -17,6 +17,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\App;
 
+/** 
+ * Testing this Job. In tinker run `event(new CourseCompleted(Course::find(1), User::find(1)));`
+ */
+
 class ProcessCertificate implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;

@@ -10,6 +10,10 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Browsershot\Browsershot;
 use EscolaLms\Templates\Models\Certificate;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use EscolaLms\Templates\Mail\TemplatePreview;
 
 class TemplateService implements TemplateServiceContract
 {
@@ -71,22 +75,52 @@ class TemplateService implements TemplateServiceContract
         return $filename;
     }
 
-    public function createPreview(Template $template): string
+    public function createPreview(Template $template): string | array
     {
-        switch ($template->vars_set) {
-            case "certificates":
-                $vars = $this->variableService->getMockVariables(Certificate::class);
-                break;
-            default:
-                $vars = [];
-        }
+
+        $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
+        $vars = $enum::getMockVariables();
 
         $content = strtr($template->content, $vars);
-        $content = view('templates::ckeditor', ['body' => $content])->render();
+        $result = $content;
+        switch ($template->type) {
+            case "pdf":
+                $content = view('templates::ckeditor', ['body' => $content])->render();
+                $result = $this->previewPDF($content);
+                break;
+            case "email":
+                $content = view('templates::email', ['body' => $content])->render();
+                $result = $this->previewEmail($content);
+                break;
+        }
 
+
+        return $result;
+    }
+
+    private function previewEmail($markup, string $email = null): array
+    {
+        if (empty($email)) {
+            $user = Auth::user();
+            $email = $user->email;
+        }
+
+        Mail::to($email)->send(new TemplatePreview($markup));
+        return [
+            'sent' => true,
+            'to' => $email
+        ];
+    }
+
+    private function previewPDF($markup): array
+    {
         $filename = 'preview-' . uniqid() . '.pdf';
 
-        Browsershot::html($content)
+        $dir = Storage::disk('local')->makeDirectory('tmp_pdfs/');
+        $path = Storage::disk('local')->path('tmp_pdfs/' . $filename);
+        $url = Storage::disk('local')->url('tmp_pdfs/' . $filename);
+
+        Browsershot::html($markup)
             ->addChromiumArguments([
                 'no-sandbox',
                 'disable-setuid-sandbox',
@@ -94,10 +128,11 @@ class TemplateService implements TemplateServiceContract
                 'single-process'
             ])
             ->timeout(120)
-            ->save($filename);
+            ->save($path);
 
-        // Add this file to delete queue
-
-        return $filename;
+        return [
+            'filename' => $filename,
+            'url' => $url
+        ];
     }
 }

@@ -16,8 +16,3 @@ Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], 
     Route::delete('/{id}', [TemplatesAdminApiController::class, 'delete']);
     Route::patch('/{id}', [TemplatesAdminApiController::class, 'update']);
 });
-
-Route::get('/api/testtt', function () {
-    event(new CourseCompleted(Course::find(1), User::find(1)));
-    return "ok";
-});

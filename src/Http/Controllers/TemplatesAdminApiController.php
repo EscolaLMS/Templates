@@ -100,29 +100,17 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         }
     }
 
-    public function previewPdf(TemplateReadRequest $request, $id): Response
+    public function preview(TemplateReadRequest $request, $id): Response
     {
         $template = Template::findOrFail($id);
 
-        $filepath = $this->templateService->createPreview($template);
+        $preview = $this->templateService->createPreview($template);
 
         try {
-            return response()->file(public_path($filepath));
+            return $this->sendResponse($preview, "template preview fetched successfully");
         } catch (Exception $e) {
             return $this->sendError($e->getMessage());
         }
     }
-
-    public function previewEmail(TemplateReadRequest $request, $id): Response
-    {
-        $template = Template::findOrFail($id);
-
-        $filepath = $this->templateService->createPreview($template);
-
-        try {
-            return response()->file(public_path($filepath));
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
+    
 }

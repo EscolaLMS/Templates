@@ -14,10 +14,11 @@ class VariablesService implements VariablesServiceContract
 {
     private static array $tokens = [
         'pdf' => [
-            'certificate' => PdfCertificateVar::class
+            'certificate' => PdfCertificateVar::class,
         ],
         'email' => [
-            'certificate' => EmailCertificateVar::class
+            'certificate' => EmailCertificateVar::class,
+
         ]
     ];
 
@@ -40,8 +41,9 @@ class VariablesService implements VariablesServiceContract
         return self::$tokens[$type][$classType]::getMockValues();
     }
 
-    public function getCertificateVariables(Course $course, User $user): array
-    {
-        return CertificateVar::getVariablesFromContent($course, $user);
+    public function getVariableEnumClassName($type, $vars_set): string {
+        return self::$tokens[$type][$vars_set];
     }
+
+
 }
