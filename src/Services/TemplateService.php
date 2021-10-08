@@ -75,14 +75,14 @@ class TemplateService implements TemplateServiceContract
         return $filename;
     }
 
-    public function createPreview(Template $template): string | array
+    public function createPreview(Template $template): array
     {
 
         $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
         $vars = $enum::getMockVariables();
 
         $content = strtr($template->content, $vars);
-        $result = $content;
+        $result = ['content'=>$content];
         switch ($template->type) {
             case "pdf":
                 $content = view('templates::ckeditor', ['body' => $content])->render();
