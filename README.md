@@ -1,2 +1,7 @@
-# Templates
-Templates to generate PDFs (eg Certificates) and email notifications 
+# Templates like Certificates
+
+## papeteer to generate PDF
+
+## email templates
+
+
