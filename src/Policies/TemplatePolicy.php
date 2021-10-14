@@ -34,7 +34,7 @@ class TemplatePolicy
      * @param Template $template
      * @return bool
      */
-    public function delete(User $user, Template $template)
+    public function delete(User $user, Template $template = null)
     {
         return $user->can('delete templates');
     }
@@ -44,7 +44,7 @@ class TemplatePolicy
      * @param Template $template
      * @return bool
      */
-    public function update(User $user, Template $template)
+    public function update(User $user, Template $template = null)
     {
         return $user->can('update templates');
     }

@@ -14,7 +14,6 @@ use EscolaLms\Templates\Services\VariablesService;
 use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
 
-
 class TestCase extends \EscolaLms\Core\Tests\TestCase
 {
     use DatabaseTransactions;
@@ -28,7 +27,6 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
         $variablesService = resolve(VariablesServiceContract::class);
         $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
         $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
-
     }
 
     protected function getPackageProviders($app): array
@@ -50,10 +48,8 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
 
     protected function authenticateAsAdmin()
     {
-        $this->user = config('auth.providers.users.model')::factory()->create();        
+        $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
-        $this->user->givePermissionTo('create templates');
-        $this->user->givePermissionTo('update templates');
-        $this->user->givePermissionTo('delete templates');
+        $this->user->assignRole('admin');
     }
 }

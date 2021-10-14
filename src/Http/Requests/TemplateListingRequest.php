@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Http\Requests;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\FormRequest;
+use EscolaLms\Templates\Models\Template;
 
 class TemplateListingRequest extends FormRequest
 {

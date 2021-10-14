@@ -3,7 +3,7 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use EscolaLms\Core\Models\User;
-use EscolaLms\Core\Models\Template;
+use EscolaLms\Templates\Models\Template;
 
 use Illuminate\Foundation\Http\FormRequest;
 

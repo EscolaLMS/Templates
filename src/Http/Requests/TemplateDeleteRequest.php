@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use EscolaLms\Templates\Models\Template;
 
 class TemplateDeleteRequest extends FormRequest
 {
