@@ -48,6 +48,7 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         if (!$updated) {
             return $this->sendError(sprintf("template id '%s' doesn't exists", $id), 404);
         }
+        return $this->sendResponse($updated, "template updated successfully");
     }
 
     public function delete(TemplateDeleteRequest $request, int $id): JsonResponse
@@ -56,7 +57,7 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         if (!$deleted) {
             return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
         }
-        return $this->sendResponse($deleted, "template updated successfully");
+        return $this->sendResponse($deleted, "template deleted successfully");
     }
 
     public function read(TemplateReadRequest $request, int $id): JsonResponse
