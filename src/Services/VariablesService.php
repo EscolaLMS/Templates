@@ -2,13 +2,11 @@
 
 namespace EscolaLms\Templates\Services;
 
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
-use EscolaLms\Courses\Models\Course;
-use EscolaLms\Auth\Models\User;
-use EscolaLms\Templates\Models\Certificate;
 use EscolaLms\Templates\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use InvalidArgumentException;
 
 class VariablesService implements VariablesServiceContract
 {
@@ -22,9 +20,12 @@ class VariablesService implements VariablesServiceContract
         ]
     ];
 
-    public static function addToken(TemplateVariableContract $token, string $type = 'pdf'): array
+    public static function addToken(string $tokenClass, string $type = 'pdf', string $subtype = 'certificate'): array
     {
-        self::$tokens[$type] = $token;
+        if (!is_a($tokenClass, TemplateVariableContract::class, true)) {
+            throw new InvalidArgumentException();
+        }
+        self::$tokens[$type][$subtype] = $tokenClass;
         return self::$tokens;
     }
 
@@ -36,14 +37,13 @@ class VariablesService implements VariablesServiceContract
         ];
     }
 
-    public function getMockVariables(string $classType, string $type ='pdf'): array
+    public function getMockVariables(string $classType, string $type = 'pdf'): array
     {
         return self::$tokens[$type][$classType]::getMockValues();
     }
 
-    public function getVariableEnumClassName($type, $vars_set): string {
+    public function getVariableEnumClassName($type, $vars_set): string
+    {
         return self::$tokens[$type][$vars_set];
     }
-
-
 }
