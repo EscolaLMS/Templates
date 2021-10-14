@@ -42,7 +42,7 @@ class TemplatesPreviewTest extends TestCase
         $this->assertIsArray($variables->pdf->certificates);
     }
 
-    /*
+
     public function testAdminCanCreateEmailPreview()
     {
         $this->authenticateAsAdmin();
@@ -108,5 +108,4 @@ class TemplatesPreviewTest extends TestCase
 
         $response->assertOk();
     }
-    */
 }
