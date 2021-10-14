@@ -11,8 +11,6 @@ use EscolaLms\Templates\Repository\TemplateRepository;
 use EscolaLms\Templates\Services\TemplateService;
 use EscolaLms\Templates\Services\VariablesService;
 use EscolaLms\Courses\Events\CourseCompleted;
-use EscolaLms\Templates\Jobs\ProcessCertificate;
-use function Illuminate\Events\queueable;
 use Illuminate\Support\Facades\Event;
 
 /**
@@ -32,20 +30,10 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
         $this->app->register(AuthServiceProvider::class);
     }
 
-    private function loadListeners()
-    {
-        Event::listen(function (CourseCompleted $event) {
-            $course_id = $event->getCourse()->id;
-            $user_id = $event->getUser()->id;
-            // ProcessCertificate::dispatch($course_id, $user_id);
-        });
-    }
-
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../views', 'templates');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
-        $this->loadListeners();
     }
 }
