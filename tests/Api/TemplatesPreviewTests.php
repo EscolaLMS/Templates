@@ -14,6 +14,19 @@ class TemplatesPreviewTests extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $variablesService = resolve(VariablesServiceContract::class);
+        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
+        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+    }
+
+    public function testAdminCanListVariables()
+    {
+        $this->assetTrue(true);
+    }
+
     public function testAdminCanCreateEmailPreview()
     {
         $this->authenticateAsAdmin();
@@ -62,7 +75,7 @@ class TemplatesPreviewTests extends TestCase
 
         $response->assertStatus(201);
 
-        $id = $response->getData()->data->id;    
+        $id = $response->getData()->data->id;
 
         $response = $this->actingAs($this->user, 'api')->get(
             '/api/admin/templates/' . $id . '/preview',
@@ -70,6 +83,5 @@ class TemplatesPreviewTests extends TestCase
         );
 
         $response->assertOk();
-
     }
 }
