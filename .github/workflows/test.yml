@@ -1,6 +1,10 @@
 name: Tests PHPUnit in environments
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   php8-laravel-latest-phpunit-mysql:
