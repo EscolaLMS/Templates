@@ -3,8 +3,6 @@
 namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
-use EscolaLms\Templates\Enum\Email\CertificateVar as EmailCertificateVar;
-use EscolaLms\Templates\Enum\Pdf\CertificateVar as PdfCertificateVar;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use InvalidArgumentException;
 
@@ -12,10 +10,10 @@ class VariablesService implements VariablesServiceContract
 {
     private static array $tokens = [
         'pdf' => [
-            'certificate' => PdfCertificateVar::class,
+            
         ],
         'email' => [
-            'certificate' => EmailCertificateVar::class,
+            
 
         ]
     ];

@@ -9,6 +9,11 @@ use EscolaLms\Templates\EscolaLmsTemplatesServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\PassportServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Services\VariablesService;
+use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
+use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+
 
 class TestCase extends \EscolaLms\Core\Tests\TestCase
 {
@@ -20,6 +25,10 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         parent::setUp();
         $this->seed(PermissionTableSeeder::class);
+        $variablesService = resolve(VariablesServiceContract::class);
+        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
+        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+
     }
 
     protected function getPackageProviders($app): array
