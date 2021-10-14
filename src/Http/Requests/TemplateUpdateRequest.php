@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use EscolaLms\Templates\Models\Template;
 
 class TemplateUpdateRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class TemplateUpdateRequest extends FormRequest
     {
         /** @var User $user */
         $user = $this->user();
-        return $user->can('update templates', 'api');
+        return isset($user) ? $user->can('update', Template::class) : false;
     }
 
     /**
@@ -32,6 +33,4 @@ class TemplateUpdateRequest extends FormRequest
             'content' => 'string',
         ];
     }
-
-  
 }

@@ -43,15 +43,7 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
         if (!$template) {
             return false;
         }
-        try {
-            return $template->delete();
-        } catch (\Exception $err) {
-            return false;
-        }
-    }
 
-    public function save(Template $template): bool
-    {
-        return $template->save();
+        return $template->delete();
     }
 }

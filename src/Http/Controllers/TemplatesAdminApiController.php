@@ -30,74 +30,50 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
     public function list(TemplateListingRequest $request): JsonResponse
     {
-        try {
-            $templates = $this->templateService->search();
-            return $this->sendResponseForResource(TemplateResource::collection($templates), "templates list retrieved successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        $templates = $this->templateService->search();
+        return $this->sendResponseForResource(TemplateResource::collection($templates), "templates list retrieved successfully");
     }
 
     public function create(TemplateCreateRequest $request): JsonResponse
     {
-        try {
-            $template = $this->templateService->insert($request->all());
-            return $this->sendResponseForResource(TemplateResource::make($template), "template created successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        $template = $this->templateService->insert($request->all());
+        return $this->sendResponseForResource(TemplateResource::make($template), "template created successfully");
     }
 
     public function update(TemplateUpdateRequest $request, int $id): JsonResponse
     {
-        try {
-            $input = $request->all();
+        $input = $request->all();
 
-            $updated = $this->templateService->update($id, $input);
-            if (!$updated) {
-                return $this->sendError(sprintf("template id '%s' doesn't exists", $id), 404);
-            }
-            return $this->sendResponseForResource(TemplateResource::make($updated), "template updated successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
+        $updated = $this->templateService->update($id, $input);
+        if (!$updated) {
+            return $this->sendError(sprintf("template id '%s' doesn't exists", $id), 404);
         }
+        return $this->sendResponse($updated, "template updated successfully");
     }
 
     public function delete(TemplateDeleteRequest $request, int $id): JsonResponse
     {
-        try {
-            $deleted = $this->templateService->deleteById($id);
-            if (!$deleted) {
-                return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
-            }
-            return $this->sendResponse($deleted, "template updated successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
+        $deleted = $this->templateService->deleteById($id);
+        if (!$deleted) {
+            return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
         }
+        return $this->sendResponse($deleted, "template deleted successfully");
     }
 
     public function read(TemplateReadRequest $request, int $id): JsonResponse
     {
-        try {
-            $template = $this->templateService->getById($id);
-            if ($template->exists) {
-                return $this->sendResponseForResource(TemplateResource::make($template), "template fetched successfully");
-            }
-            return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
+        $template = $this->templateService->getById($id);
+        if ($template->exists) {
+            return $this->sendResponseForResource(TemplateResource::make($template), "template fetched successfully");
         }
+        return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
     }
 
     public function variables(TemplateReadRequest $request): JsonResponse
     {
         $vars = $this->variablesService->getAvailableTokens();
 
-        try {
-            return $this->sendResponse($vars, "template vars fetched successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        return $this->sendResponse($vars, "template vars fetched successfully");
     }
 
     public function preview(TemplateReadRequest $request, $id): Response
@@ -106,11 +82,6 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
         $preview = $this->templateService->createPreview($template);
 
-        try {
-            return $this->sendResponse($preview, "template preview fetched successfully");
-        } catch (Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        return $this->sendResponse($preview, "template preview fetched successfully");
     }
-    
 }

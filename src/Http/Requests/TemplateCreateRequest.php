@@ -3,6 +3,8 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Models\Template;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class TemplateCreateRequest extends FormRequest
@@ -16,7 +18,7 @@ class TemplateCreateRequest extends FormRequest
     {
         /** @var User $user */
         $user = $this->user();
-        return $user->can('create templates', 'api');
+        return isset($user) ? $user->can('create', Template::class) : false;
     }
 
     /**
@@ -33,6 +35,4 @@ class TemplateCreateRequest extends FormRequest
             'content' => 'string|required',
         ];
     }
-
-    
 }

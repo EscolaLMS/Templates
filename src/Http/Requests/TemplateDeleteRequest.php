@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use EscolaLms\Templates\Models\Template;
 
 class TemplateDeleteRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class TemplateDeleteRequest extends FormRequest
     {
         /** @var User $user */
         $user = $this->user();
-        return $user->can('delete templates', 'api');
+        return isset($user) ? $user->can('delete', Template::class) : false;
     }
 
     /**

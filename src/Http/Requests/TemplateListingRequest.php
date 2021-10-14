@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Http\Requests;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\FormRequest;
+use EscolaLms\Templates\Models\Template;
 
 class TemplateListingRequest extends FormRequest
 {
@@ -13,7 +14,8 @@ class TemplateListingRequest extends FormRequest
     public function authorize()
     {
         /** @var User $user */
-        return true;
+        $user = $this->user();
+        return isset($user) ? $user->can('list', Template::class) : false;
     }
 
     /**

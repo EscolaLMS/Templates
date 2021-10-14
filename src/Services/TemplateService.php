@@ -8,7 +8,6 @@ use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Browsershot\Browsershot;
-use EscolaLms\Templates\Models\Certificate;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
@@ -42,9 +41,7 @@ class TemplateService implements TemplateServiceContract
         $template = new Template();
         $template->fill($data);
         $this->repository->insert($template);
-        if (!$template->exists()) {
-            throw new Exception("error creating template");
-        }
+
         return $template;
     }
 
@@ -77,7 +74,6 @@ class TemplateService implements TemplateServiceContract
 
     public function createPreview(Template $template): array
     {
-
         $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
         $vars = $enum::getMockVariables();
 

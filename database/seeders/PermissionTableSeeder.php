@@ -16,9 +16,7 @@ class PermissionTableSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $apiAdmin = Role::findOrCreate('admin', 'api');
-        $permissions = ['delete templates', 'create templates', 'update templates'];
-
-        // TODO this should also include "list" and "updateOwn" 
+        $permissions = ['delete templates', 'create templates', 'update templates', 'list templates'];
 
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'api');

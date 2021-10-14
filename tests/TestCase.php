@@ -9,6 +9,8 @@ use EscolaLms\Templates\EscolaLmsTemplatesServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\PassportServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Services\VariablesService;
 
 class TestCase extends \EscolaLms\Core\Tests\TestCase
 {
@@ -20,6 +22,11 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         parent::setUp();
         $this->seed(PermissionTableSeeder::class);
+        /*
+        $variablesService = resolve(VariablesServiceContract::class);
+        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
+        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+        */
     }
 
     protected function getPackageProviders($app): array
@@ -36,14 +43,13 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
+        $app['config']->set('mail.driver', 'log');
     }
 
     protected function authenticateAsAdmin()
     {
         $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
-        $this->user->givePermissionTo('create templates');
-        $this->user->givePermissionTo('update templates');
-        $this->user->givePermissionTo('delete templates');
+        $this->user->assignRole('admin');
     }
 }
