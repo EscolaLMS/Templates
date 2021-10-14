@@ -10,6 +10,7 @@ use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 
 use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use InvalidArgumentException;
 
 class ServiceTest extends TestCase
 {
@@ -63,5 +64,12 @@ class ServiceTest extends TestCase
         $pdf_filename = $this->templateService->generatePDF($template, ['@VarDateFinished'=>'2022']);
 
         $this->assertTrue(is_string($pdf_filename));
+    }
+
+    public function testTokenClassException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->variablesService::addToken('blablabla', 'email', 'certificates');
     }
 }
