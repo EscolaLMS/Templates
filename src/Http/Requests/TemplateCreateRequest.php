@@ -31,7 +31,6 @@ class TemplateCreateRequest extends FormRequest
             'vars_set' => 'string',
             'name' => 'string|required',
             'content' => 'string|required',
-            'course_id' => 'integer|exists:courses'
         ];
     }
 

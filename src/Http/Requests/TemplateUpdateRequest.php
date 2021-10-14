@@ -30,7 +30,6 @@ class TemplateUpdateRequest extends FormRequest
             'vars_set' => 'string',
             'name' => 'string',
             'content' => 'string',
-            'course_id' => 'integer|exists:courses'
         ];
     }
 
