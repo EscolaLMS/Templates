@@ -8,7 +8,10 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Templates\Mail\TemplatePreview;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-
+use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
+use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
 
 class TemplatesPreviewTests extends TestCase
 {
@@ -56,7 +59,7 @@ class TemplatesPreviewTests extends TestCase
         // Mail::assertSent(TemplatePreview::class);
 
         Mail::assertSent(function (TemplatePreview $mail) {
-            return strpos($mail->markdown, '<code>HelloWorld</code>') !== FALSE;
+            return strpos($mail->markdown, '<code>HelloWorld</code>') !== false;
         });
     }
 

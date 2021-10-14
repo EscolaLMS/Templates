@@ -10,10 +10,10 @@ class VariablesService implements VariablesServiceContract
 {
     private static array $tokens = [
         'pdf' => [
-            
+
         ],
         'email' => [
-            
+
 
         ]
     ];
@@ -37,7 +37,7 @@ class VariablesService implements VariablesServiceContract
 
     public function getMockVariables(string $classType, string $type = 'pdf'): array
     {
-        return self::$tokens[$type][$classType]::getMockValues();
+        return self::$tokens[$type][$classType]::getMockVariables();
     }
 
     public function getVariableEnumClassName($type, $vars_set): string
