@@ -19,7 +19,6 @@ class TemplateResource extends JsonResource
             'name' => $this->name,
             'type' => $this->type,
             'vars_set' => $this->vars_set,
-            'course_id' => $this->course_id,
             'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
