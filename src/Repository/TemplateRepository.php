@@ -24,7 +24,6 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
         return $this->allQuery($search)->orderBy($orderColumn, $orderDirection)->paginate($perPage);
     }
 
-
     /**
      * @param Template $template
      * @return Template
