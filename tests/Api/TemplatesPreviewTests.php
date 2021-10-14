@@ -20,7 +20,7 @@ class TemplatesPreviewTests extends TestCase
         $template = Template::factory()->makeOne([
             'type' => 'email',
             'vars_set' => 'certificates',
-            'content' => '<a href="mailto:@VarStudentEmail">@VarStudentEmail</a>'
+            'content' => '<a href="mailto:@VarStudentEmail">@VarStudentEmail</a> <code>HelloWorld</code>'
         ]);
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
@@ -40,7 +40,11 @@ class TemplatesPreviewTests extends TestCase
 
         $response->assertOk();
 
-        Mail::assertSent(TemplatePreview::class);
+        // Mail::assertSent(TemplatePreview::class);
+
+        Mail::assertSent(function (TemplatePreview $mail) {
+            return strpos($mail->markdown, '<code>HelloWorld</code>') !== FALSE;
+        });
     }
 
     public function testAdminCanCreatePDFPreview()
@@ -59,8 +63,6 @@ class TemplatesPreviewTests extends TestCase
         $response->assertStatus(201);
 
         $id = $response->getData()->data->id;    
-
-        @mkdir($dir, 0777, true);
 
         $response = $this->actingAs($this->user, 'api')->get(
             '/api/admin/templates/' . $id . '/preview',

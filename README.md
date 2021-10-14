@@ -12,9 +12,9 @@ General purpose of this package is to store in database various templates.
 So far this is a straightforward implementation that use [strtr](https://www.php.net/manual/en/function.strtr.php). 
 
 Each template is defined by
-- type: so far Email or PDF 
-- vars_set: which variable set it contains 
-- validation: eg. Confirmation email must contain Confirmation URL Link. 
+- `type`: so far Email or PDF 
+- `vars_set`: which variable set it contains 
+- `validation`: eg. Confirmation email must contain Confirmation URL Link. 
 
 ## Variable Set 
 
@@ -27,6 +27,7 @@ This package has no Variable Set. Each of this is defined be another package
 Best result generating PDF from HTML is by using headless chromium like papeteer. 
 Caveat is that is does require installing Node.js and many binaries. This package use [spatie/browsershot](https://github.com/spatie/browsershot). 
 Full list of installation requirements can be found on [their documentation](https://github.com/spatie/browsershot#requirements).
+Our [Docker PHP images](https://hub.docker.com/r/escolalms/php) have this preinstalled already.
 
 ## Email Templates
 
