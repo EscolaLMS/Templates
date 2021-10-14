@@ -36,7 +36,10 @@ class TemplatesPreviewTests extends TestCase
         $template = Template::factory()->makeOne([
             'type' => 'email',
             'vars_set' => 'certificates',
-            'content' => '<a href="mailto:@VarStudentEmail">@VarStudentEmail</a> <code>HelloWorld</code>'
+            'content' => '<a href="mailto:@VarStudentEmail">@VarStudentEmail</a>
+            <code>HelloWorld</code>
+            <date>@VarDateFinished</date>
+            '
         ]);
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
@@ -56,10 +59,15 @@ class TemplatesPreviewTests extends TestCase
 
         $response->assertOk();
 
-        // Mail::assertSent(TemplatePreview::class);
+        Mail::assertSent(TemplatePreview::class);
 
         Mail::assertSent(function (TemplatePreview $mail) {
             return strpos($mail->markdown, '<code>HelloWorld</code>') !== false;
+        });
+
+        Mail::assertSent(function (TemplatePreview $mail) {
+            $date = preg_match_all('/<date>(.*?)<\/date>/s', $mail->markdown, $matches);
+            return strtotime($matches[1][0]) !== false;
         });
     }
 
