@@ -13,7 +13,7 @@ class TemplateListingRequest extends FormRequest
     public function authorize()
     {
         /** @var User $user */
-        return true;
+        return isset($user) ? $user->can('list', Template::class) : false;
     }
 
     /**

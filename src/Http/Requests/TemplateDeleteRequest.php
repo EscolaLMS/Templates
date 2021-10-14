@@ -15,7 +15,7 @@ class TemplateDeleteRequest extends FormRequest
     {
         /** @var User $user */
         $user = $this->user();
-        return $user->can('delete templates', 'api');
+        return isset($user) ? $user->can('delete', Template::class) : false;
     }
 
     /**

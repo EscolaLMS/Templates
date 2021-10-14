@@ -10,7 +10,15 @@ class TemplatePolicy
 {
     use HandlesAuthorization;
 
-    // TODO this should also include "list" and "updateOwn" 
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function list(User $user)
+    {
+        return $user->can('list templates');
+    }
 
     /**
      * @param User $user
@@ -36,7 +44,7 @@ class TemplatePolicy
      * @param Template $template
      * @return bool
      */
-    public function update(User $user,  Template $template)
+    public function update(User $user, Template $template)
     {
         return $user->can('update templates');
     }
