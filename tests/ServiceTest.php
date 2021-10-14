@@ -51,4 +51,17 @@ class ServiceTest extends TestCase
         $className = $this->variablesService->getVariableEnumClassName('email', 'certificates');
         $this->assertEquals($className, EmailCertificateVar::class);
     }
+
+    public function testGeneratePDF()
+    {
+        $template = Template::factory()->createOne([
+            'type' => 'pdf',
+            'vars_set' => 'certificates',
+            'content' => 'Date course was finished: @VarDateFinished'
+        ]);
+
+        $pdf_filename = $this->templateService->generatePDF($template, ['@VarDateFinished'=>'2022']);
+
+        $this->assertTrue(is_string($pdf_filename));
+    }
 }

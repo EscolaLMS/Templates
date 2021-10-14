@@ -41,9 +41,7 @@ class TemplateService implements TemplateServiceContract
         $template = new Template();
         $template->fill($data);
         $this->repository->insert($template);
-        if (!$template->exists()) {
-            throw new Exception("error creating template");
-        }
+
         return $template;
     }
 
@@ -76,7 +74,6 @@ class TemplateService implements TemplateServiceContract
 
     public function createPreview(Template $template): array
     {
-
         $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
         $vars = $enum::getMockVariables();
 

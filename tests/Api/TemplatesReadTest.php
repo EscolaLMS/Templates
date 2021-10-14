@@ -17,7 +17,8 @@ class TemplatesReadTest extends TestCase
 
     public function testCannotFindMissing()
     {
-        $response = $this->getJson($this->uri('non-existing-template'));
+        $this->authenticateAsAdmin();
+        $response = $this->actingAs($this->user, 'api')->getJson($this->uri('non-existing-template'));
         $response->assertNotFound();
     }
 
