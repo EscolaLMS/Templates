@@ -21,7 +21,7 @@ interface TemplateServiceContract
 
     public function update(int $id, array $data): Template;
 
-    public function createPreview(Template $template) : array;
+    public function createPreview(Template $template): array;
 
-
+    public function isValid(Template $template): bool;
 }

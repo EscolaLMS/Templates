@@ -3,7 +3,6 @@
 namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Repository\TemplateRepository;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 

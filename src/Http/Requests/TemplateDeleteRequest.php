@@ -2,21 +2,18 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use EscolaLms\Templates\Models\Template;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class TemplateDeleteRequest extends FormRequest
 {
-
-
     /**
      * @return bool
      */
     public function authorize()
     {
-        /** @var User $user */
-        $user = $this->user();
-        return isset($user) ? $user->can('delete', Template::class) : false;
+        return Gate::allows('delete', Template::class);
     }
 
     /**

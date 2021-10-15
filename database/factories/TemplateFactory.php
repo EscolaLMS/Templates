@@ -10,7 +10,6 @@ class TemplateFactory extends Factory
 {
     protected $model = Template::class;
 
-
     public function definition()
     {
         $title = $this->faker->catchPhrase;

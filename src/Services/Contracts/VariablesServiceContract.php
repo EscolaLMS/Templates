@@ -8,11 +8,11 @@ namespace EscolaLms\Templates\Services\Contracts;
  */
 interface VariablesServiceContract
 {
-    public static function addToken(string $tokenClass, string $type = 'pdf', string $subtype = 'certificate'): array;
+    public static function addToken(string $variableSetClass, string $type = 'pdf', string $vars_set = 'certificate'): array;
 
     public function getAvailableTokens(): array;
 
-    public function getMockVariables(string $className): array;
+    public function getMockVariables(string $vars_set, string $type = 'pdf'): array;
 
-    public function getVariableEnumClassName($type, $vars_set): string;
+    public function getVariableEnumClassName(?string $type, ?string $vars_set): string;
 }

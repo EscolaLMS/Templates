@@ -3,7 +3,6 @@
 namespace EscolaLms\Templates\Repository\Contracts;
 
 use EscolaLms\Core\Repositories\Contracts\BaseRepositoryContract;
-use EscolaLms\Templates\Models\Template;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface TemplateRepositoryContract extends BaseRepositoryContract
