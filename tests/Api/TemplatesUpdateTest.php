@@ -47,6 +47,7 @@ class TemplatesUpdateTest extends TestCase
 
         $this->assertEquals($templateNew->name, $template->name);
         $this->assertEquals($templateNew->content, $template->content);
+        $this->assertTrue($template->is_valid);
     }
 
     public function testAdminCanUpdateExistingTemplateWithMissingName()
@@ -72,6 +73,7 @@ class TemplatesUpdateTest extends TestCase
         $this->assertEquals($oldName, $template->name);
         $this->assertEquals($templateNew->content, $template->content);
         $this->assertNotEquals($oldContent, $templateNew->content);
+        $this->assertTrue($template->is_valid);
     }
 
     public function testAdminCanUpdateExistingTemplateWithMissingContent()
