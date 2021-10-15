@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -11,6 +12,14 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class TemplatesCreateTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $variablesService = resolve(VariablesServiceContract::class);
+        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
+        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+    }
 
     private function uri(string $suffix): string
     {
@@ -54,9 +63,6 @@ class TemplatesCreateTest extends TestCase
 
     public function testAdminCannotCreateTemplateWithInvalidContent()
     {
-        $variablesService = resolve(VariablesServiceContract::class);
-        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
-
         $this->authenticateAsAdmin();
 
         $template = Template::factory()->makeOne();

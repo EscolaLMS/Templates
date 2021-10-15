@@ -3,6 +3,8 @@
 namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
+use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -10,6 +12,14 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class TemplatesUpdateTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $variablesService = resolve(VariablesServiceContract::class);
+        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
+        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+    }
 
     private function uri(int $id): string
     {
