@@ -30,6 +30,10 @@ class TemplatesCreateTest extends TestCase
     {
         $this->authenticateAsAdmin();
         $template = Template::factory()->makeOne(['name' => 'false']);
+        $template->type = 'pdf';
+        $template->vars_set = 'certificates';
+        $template->content .= PdfCertificateVar::COURSE_TITLE;
+
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
             $template->toArray()

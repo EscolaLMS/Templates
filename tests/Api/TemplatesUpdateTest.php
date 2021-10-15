@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar;
@@ -32,7 +33,7 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $templateNew->content = $templateNew->content . CertificateVar::COURSE_TITLE;
+        $templateNew->content .= CertificateVar::COURSE_TITLE;
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
@@ -54,7 +55,7 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $templateNew->content = $templateNew->content . CertificateVar::COURSE_TITLE;
+        $templateNew->content .= CertificateVar::COURSE_TITLE;
 
         $oldName = $template->name;
         $oldContent = $template->content;
