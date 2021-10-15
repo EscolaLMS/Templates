@@ -3,7 +3,7 @@
 namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Repository\TemplateRepository;
+use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -22,28 +22,31 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
+        $templateNew->content = $templateNew->content . CertificateVar::COURSE_TITLE;
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
             [
-                'title' => $templateNew->title,
+                'name' => $templateNew->name,
                 'content' => $templateNew->content,
             ]
         );
         $response->assertOk();
         $template->refresh();
 
-        $this->assertEquals($templateNew->title, $template->title);
+        $this->assertEquals($templateNew->name, $template->name);
         $this->assertEquals($templateNew->content, $template->content);
     }
 
-    public function testAdminCanUpdateExistingTemplateWithMissingTitle()
+    public function testAdminCanUpdateExistingTemplateWithMissingName()
     {
         $this->authenticateAsAdmin();
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $oldTitle = $template->title;
+        $templateNew->content = $templateNew->content . CertificateVar::COURSE_TITLE;
+
+        $oldName = $template->name;
         $oldContent = $template->content;
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
@@ -55,8 +58,9 @@ class TemplatesUpdateTest extends TestCase
         $response->assertStatus(200);
         $template->refresh();
 
-        $this->assertEquals($oldTitle, $template->title);
+        $this->assertEquals($oldName, $template->name);
         $this->assertEquals($templateNew->content, $template->content);
+        $this->assertNotEquals($oldContent, $templateNew->content);
     }
 
     public function testAdminCanUpdateExistingTemplateWithMissingContent()
@@ -65,19 +69,19 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $oldTitle = $template->title;
+        $oldName = $template->name;
         $oldContent = $template->content;
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
             [
-                'title' => $templateNew->title,
+                'name' => $templateNew->name,
             ]
         );
         $response->assertStatus(200);
         $template->refresh();
 
-        $this->assertEquals($templateNew->title, $template->title);
+        $this->assertEquals($templateNew->name, $template->name);
         $this->assertEquals($oldContent, $template->content);
     }
 
@@ -90,7 +94,7 @@ class TemplatesUpdateTest extends TestCase
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri(99999999),
             [
-                'title' => $template->title,
+                'name' => $template->name,
                 'content' => $template->content,
             ]
         );
@@ -104,20 +108,20 @@ class TemplatesUpdateTest extends TestCase
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
 
-        $oldTitle = $template->title;
+        $oldName = $template->name;
         $oldContent = $template->content;
 
         $response = $this->patchJson(
             $this->uri($template->id),
             [
-                'title' => $templateNew->title,
+                'name' => $templateNew->name,
                 'content' => $templateNew->content,
             ]
         );
         $response->assertUnauthorized();
         $template->refresh();
 
-        $this->assertEquals($oldTitle, $template->title);
+        $this->assertEquals($oldName, $template->name);
         $this->assertEquals($oldContent, $template->content);
     }
 }

@@ -2,16 +2,14 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
-use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Templates\Mail\TemplatePreview;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
+use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use EscolaLms\Templates\Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
 
 class TemplatesPreviewTest extends TestCase
 {
@@ -34,14 +32,14 @@ class TemplatesPreviewTest extends TestCase
 
         $response->assertOk();
 
-        $variables = $response->getData()->data;
+        $json = $response->json();
+        $variables = $json['data'];
 
-        $this->assertTrue(isset($variables->email->certificates));
-        $this->assertTrue(isset($variables->pdf->certificates));
-        $this->assertIsArray($variables->email->certificates);
-        $this->assertIsArray($variables->pdf->certificates);
+        $this->assertTrue(isset($variables['email']['certificates']));
+        $this->assertTrue(isset($variables['pdf']['certificates']));
+        $this->assertIsArray($variables['email']['certificates']);
+        $this->assertIsArray($variables['pdf']['certificates']);
     }
-
 
     public function testAdminCanCreateEmailPreview()
     {
@@ -49,10 +47,12 @@ class TemplatesPreviewTest extends TestCase
         $template = Template::factory()->makeOne([
             'type' => 'email',
             'vars_set' => 'certificates',
-            'content' => '<a href="mailto:@VarStudentEmail">@VarStudentEmail</a>
-            <code>HelloWorld</code>
-            <date>@VarDateFinished</date>
-            '
+            'content' => <<<EOT
+                            <h1>@VarCourseTitle</h1>
+                            <a href="mailto:@VarStudentEmail">@VarStudentEmail</a>
+                            <code>HelloWorld</code>
+                            <date>@VarDateFinished</date>
+                            EOT
         ]);
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
@@ -90,7 +90,7 @@ class TemplatesPreviewTest extends TestCase
         $template = Template::factory()->makeOne([
             'type' => 'pdf',
             'vars_set' => 'certificates',
-            'content' => 'Date course was finished: @VarDateFinished'
+            'content' => 'Course: @VarCourseTitle<br />Date course was finished: @VarDateFinished'
         ]);
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',

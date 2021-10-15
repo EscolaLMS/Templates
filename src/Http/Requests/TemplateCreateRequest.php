@@ -2,23 +2,19 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
-use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Models\Template;
-
+use EscolaLms\Templates\Rules\TemplateValidContentRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class TemplateCreateRequest extends FormRequest
 {
-
-
     /**
      * @return bool
      */
     public function authorize()
     {
-        /** @var User $user */
-        $user = $this->user();
-        return isset($user) ? $user->can('create', Template::class) : false;
+        return Gate::allows('create', Template::class);
     }
 
     /**
@@ -29,10 +25,10 @@ class TemplateCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'string',
-            'vars_set' => 'string',
-            'name' => 'string|required',
-            'content' => 'string|required',
+            'type' => ['string'],
+            'vars_set' => ['string'],
+            'name' => ['string', 'required'],
+            'content' => ['string', 'required', new TemplateValidContentRule()],
         ];
     }
 }

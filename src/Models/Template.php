@@ -2,10 +2,11 @@
 
 namespace EscolaLms\Templates\Models;
 
-use EscolaLms\Courses\Models\Course;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use EscolaLms\Templates\Database\Factories\TemplateFactory;
+use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
+use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 
 /**
  * @OA\Schema(
@@ -37,6 +38,7 @@ use EscolaLms\Templates\Database\Factories\TemplateFactory;
  * @property string $name
  * @property string $type
  * @property string $content
+ * @property string $vars_set
  */
 class Template extends Model
 {
@@ -75,5 +77,11 @@ class Template extends Model
     protected static function newFactory()
     {
         return TemplateFactory::new();
+    }
+
+    public function getIsValidAttribute(): bool
+    {
+        $service = app(TemplateServiceContract::class);
+        return $service->isValid($this);
     }
 }

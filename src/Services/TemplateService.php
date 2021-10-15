@@ -2,17 +2,16 @@
 
 namespace EscolaLms\Templates\Services;
 
-use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
+use EscolaLms\Templates\Mail\TemplatePreview;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
-use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Spatie\Browsershot\Browsershot;
+use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use EscolaLms\Templates\Mail\TemplatePreview;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
 
 class TemplateService implements TemplateServiceContract
 {
@@ -78,7 +77,7 @@ class TemplateService implements TemplateServiceContract
         $vars = $enum::getMockVariables();
 
         $content = strtr($template->content, $vars);
-        $result = ['content'=>$content];
+        $result = ['content' => $content];
         switch ($template->type) {
             case "pdf":
                 $content = view('templates::ckeditor', ['body' => $content])->render();
@@ -130,5 +129,11 @@ class TemplateService implements TemplateServiceContract
             'filename' => $filename,
             'url' => $url
         ];
+    }
+
+    public function isValid(Template $template): bool
+    {
+        $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
+        return $enum::isValid($template->content);
     }
 }

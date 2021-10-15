@@ -2,21 +2,19 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Rules\TemplateValidContentRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class TemplateUpdateRequest extends FormRequest
 {
-
-
     /**
      * @return bool
      */
     public function authorize()
     {
-        /** @var User $user */
-        $user = $this->user();
-        return isset($user) ? $user->can('update', Template::class) : false;
+        return Gate::allows('update', Template::class);
     }
 
     /**
@@ -27,10 +25,15 @@ class TemplateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'string',
-            'vars_set' => 'string',
-            'name' => 'string',
-            'content' => 'string',
+            'type' => ['sometimes', 'string'],
+            'vars_set' => ['sometimes', 'string'],
+            'name' => ['sometimes', 'string', 'required'],
+            'content' => ['sometimes', 'string', 'required', new TemplateValidContentRule($this->getTemplate())],
         ];
+    }
+
+    public function getTemplate(): ?Template
+    {
+        return Template::find($this->route('id'));
     }
 }

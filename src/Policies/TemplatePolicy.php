@@ -10,42 +10,23 @@ class TemplatePolicy
 {
     use HandlesAuthorization;
 
-
-    /**
-     * @param User $user
-     * @return bool
-     */
-    public function list(User $user)
+    public function list(?User $user): bool
     {
-        return $user->can('list templates');
+        return !is_null($user) && $user->can('list templates');
     }
 
-    /**
-     * @param User $user
-     * @return bool
-     */
-    public function create(User $user)
+    public function create(?User $user): bool
     {
-        return $user->can('create templates');
+        return !is_null($user) && $user->can('create templates');
     }
 
-    /**
-     * @param User $user
-     * @param Template $template
-     * @return bool
-     */
-    public function delete(User $user, Template $template = null)
+    public function delete(?User $user, Template $template = null): bool
     {
-        return $user->can('delete templates');
+        return !is_null($user) && $user->can('delete templates');
     }
 
-    /**
-     * @param User $user
-     * @param Template $template
-     * @return bool
-     */
-    public function update(User $user, Template $template = null)
+    public function update(?User $user, Template $template = null): bool
     {
-        return $user->can('update templates');
+        return !is_null($user) && $user->can('update templates');
     }
 }

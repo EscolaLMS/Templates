@@ -2,11 +2,11 @@
 
 namespace EscolaLms\Templates\Tests\Enum;
 
-use EscolaLms\Core\Enums\BasicEnum;
-
-use EscolaLms\Courses\Models\Course;
 use EscolaLms\Auth\Models\User;
+use EscolaLms\Core\Enums\BasicEnum;
+use EscolaLms\Courses\Models\Course;
 use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
+use Illuminate\Support\Str;
 
 class CertificateVar extends BasicEnum implements TemplateVariableContract
 {
@@ -20,7 +20,7 @@ class CertificateVar extends BasicEnum implements TemplateVariableContract
     const COURSE_TITLE          = "@VarCourseTitle";
 
 
-    public static function getMockVariables() : array
+    public static function getMockVariables(): array
     {
 
         $faker = \Faker\Factory::create();
@@ -36,7 +36,7 @@ class CertificateVar extends BasicEnum implements TemplateVariableContract
         ];
     }
 
-    public static function getVariablesFromContent(Course $course = null, User $user = null) : array
+    public static function getVariablesFromContent(Course $course = null, User $user = null): array
     {
         return [
             self::DATE_FINISHED => date("Y-m-d H:i:s"), // TODO how to get this date from progress? 
@@ -48,5 +48,17 @@ class CertificateVar extends BasicEnum implements TemplateVariableContract
             self::TUTOR_FULL_NAME => $course->author->firstName,
             self::COURSE_TITLE => $course->title,
         ];
+    }
+
+    public static function getRequiredVariables(): array
+    {
+        return [
+            self::COURSE_TITLE
+        ];
+    }
+
+    public static function isValid(string $content): bool
+    {
+        return Str::containsAll($content, self::getRequiredVariables());
     }
 }

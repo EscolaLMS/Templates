@@ -2,9 +2,9 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Foundation\Http\FormRequest;
 use EscolaLms\Templates\Models\Template;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class TemplateListingRequest extends FormRequest
 {
@@ -13,9 +13,7 @@ class TemplateListingRequest extends FormRequest
      */
     public function authorize()
     {
-        /** @var User $user */
-        $user = $this->user();
-        return isset($user) ? $user->can('list', Template::class) : false;
+        return Gate::allows('list', Template::class);
     }
 
     /**
@@ -25,7 +23,6 @@ class TemplateListingRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-        ];
+        return [];
     }
 }
