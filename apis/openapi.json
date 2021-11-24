@@ -1,173 +1,147 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "EscolaLMS Tags",
-        "version": "0.1"
+        "title": "EscolaLMS",
+        "version": "0.0.1"
     },
     "paths": {
-        "/api/tags": {
+        "/api/admin/templates": {
             "get": {
                 "tags": [
-                    "tags"
+                    "Templates"
                 ],
-                "description": "Display a listing of the Tag",
-                "operationId": "EscolaLms\\Tags\\Http\\Controllers\\Swagger\\TagsApiSwagger::index",
+                "summary": "Lists available templates",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "list of available templates",
                         "content": {
-                            "application/json": {}
-                        }
-                    },
-                    "422": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {}
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Destroy Tags",
-                "description": "Destroy Tags",
-                "operationId": "EscolaLms\\Tags\\Http\\Controllers\\Swagger\\TagsApiSwagger::destroy",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "tags": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "": {
-                                                    "type": "integer",
-                                                    "example": "1"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
+                            "application/json": {
+                                "schema": {
+                                    "description": "map of templates identified by a slug value",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#/components/schemas/Template"
                                     }
-                                },
-                                "type": "object"
+                                }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "500": {
+                        "description": "server-side error"
                     }
                 },
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {}
-                        }
-                    },
-                    "422": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {}
-                        }
+                "security": [
+                    {
+                        "passport": []
                     }
-                }
-            }
-        },
-        "/api/tags/unique": {
-            "get": {
-                "tags": [
-                    "tags"
-                ],
-                "description": "Display the unique Tags",
-                "operationId": "EscolaLms\\Tags\\Http\\Controllers\\Swagger\\TagsApiSwagger::unique",
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {}
-                        }
-                    },
-                    "422": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {}
-                        }
-                    }
-                }
-            }
-        },
-        "/api/tags/create": {
+                ]
+            },
             "post": {
                 "tags": [
-                    "tags"
+                    "Templates"
                 ],
-                "description": "Create multiple Tags",
-                "operationId": "EscolaLms\\Tags\\Http\\Controllers\\Swagger\\TagsApiSwagger::create",
+                "summary": "Create a new template identified by id",
+                "operationId": "3fcbce98e166986cebf1387efbcfed60",
                 "requestBody": {
+                    "description": "Template attributes",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "model_type": {
-                                        "type": "string",
-                                        "example": "Category"
-                                    },
-                                    "model_id": {
-                                        "type": "integer",
-                                        "example": "1"
-                                    },
-                                    "tags": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "Nowości"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/Template"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {}
-                        }
+                        "description": "template created successfully"
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "409": {
+                        "description": "there already is a template identified by chosen slug identifier"
                     },
                     "422": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {}
-                        }
+                        "description": "one of the parameters has invalid format"
+                    },
+                    "500": {
+                        "description": "server-side error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
             }
         },
-        "/api/tags/{tag}": {
+        "/api/admin/templates/{id}": {
             "get": {
                 "tags": [
-                    "tags"
+                    "Templates"
                 ],
-                "description": "Display the specified Tag",
-                "operationId": "EscolaLms\\Tags\\Http\\Controllers\\Swagger\\TagsApiSwagger::show",
+                "summary": "Read a template identified by a given id identifier",
+                "operationId": "7a57d4b510fa4d422aa7d794d1ef1bf7",
                 "parameters": [
                     {
-                        "name": "tag",
+                        "name": "id",
                         "in": "path",
+                        "description": "Unique human-readable template identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Template"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Delete a template identified by a id",
+                "operationId": "0f1c4fb43ff4fa474da332c549337c81",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique human-readable template identifier",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -176,18 +150,189 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {}
-                        }
+                        "description": "template deleted successfully"
                     },
-                    "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/json": {}
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "400": {
+                        "description": "cannot find a template with provided slug identifier"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Update an existing template identified by id",
+                "operationId": "af7fd0165d35394f74b48a1375cb6803",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique human-readable template identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
                         }
                     }
-                }
+                ],
+                "requestBody": {
+                    "description": "Template attributes",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Template"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "template updated successfully"
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "400": {
+                        "description": "cannot find a template with provided slug identifier"
+                    },
+                    "422": {
+                        "description": "one of the parameters has invalid format"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/templates/variables": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Dictionary list of available template variables",
+                "operationId": "a0b16c5525eef0a63f2f153b42a03732",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique human-readable template identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/templates/{id}/preview": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Read a template identified by a given id identifier",
+                "operationId": "f9f62befd9643bf4ff796d28f7207587",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique human-readable template identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Preview details"
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Template": {
+                "required": [
+                    "name",
+                    "type",
+                    "vars_set",
+                    "content"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "name ",
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "type (Certificate, email, etc)",
+                        "type": "string"
+                    },
+                    "vars_set": {
+                        "description": "avaliable vars (Certificate, email account confirm, etc)",
+                        "type": "string"
+                    },
+                    "content": {
+                        "description": "template content",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
             }
         }
     }
