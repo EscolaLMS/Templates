@@ -90,7 +90,7 @@ class TemplatesPreviewTest extends TestCase
         $template = Template::factory()->makeOne([
             'type' => 'pdf',
             'vars_set' => 'certificates',
-            'content' => 'Course: @VarCourseTitle<br />Date course was finished: @VarDateFinished'
+            'content' => 'Course: ' . PdfCertificateVar::STUDENT_EMAIL . '<br />Date course was finished: @VarDateFinished'
         ]);
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
