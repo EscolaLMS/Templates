@@ -33,7 +33,7 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $templateNew->content .= CertificateVar::COURSE_TITLE;
+        $templateNew->content .= CertificateVar::STUDENT_EMAIL;
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
@@ -56,7 +56,7 @@ class TemplatesUpdateTest extends TestCase
 
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
-        $templateNew->content .= CertificateVar::COURSE_TITLE;
+        $templateNew->content .= CertificateVar::STUDENT_EMAIL;
 
         $oldName = $template->name;
         $oldContent = $template->content;

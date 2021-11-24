@@ -32,7 +32,7 @@ class TemplatesCreateTest extends TestCase
         $template = Template::factory()->makeOne(['name' => 'false']);
         $template->type = 'pdf';
         $template->vars_set = 'certificates';
-        $template->content .= PdfCertificateVar::COURSE_TITLE;
+        $template->content .= PdfCertificateVar::STUDENT_EMAIL;
 
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',

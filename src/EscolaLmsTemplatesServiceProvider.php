@@ -10,8 +10,6 @@ use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Repository\TemplateRepository;
 use EscolaLms\Templates\Services\TemplateService;
 use EscolaLms\Templates\Services\VariablesService;
-use EscolaLms\Courses\Events\CourseCompleted;
-use Illuminate\Support\Facades\Event;
 
 /**
  * SWAGGER_VERSION
@@ -33,7 +31,7 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadViewsFrom(__DIR__.'/../views', 'templates');
+        $this->loadViewsFrom(__DIR__ . '/../views', 'templates');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
     }
 }
