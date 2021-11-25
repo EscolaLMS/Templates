@@ -2,8 +2,8 @@
 
 namespace EscolaLms\Templates\Tests\Enum;
 
-use EscolaLms\Auth\Models\User;
 use EscolaLms\Core\Enums\BasicEnum;
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Enum\Contracts\TemplateVariableContract;
 use Illuminate\Support\Str;
 

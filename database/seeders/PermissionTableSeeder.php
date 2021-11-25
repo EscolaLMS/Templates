@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Database\Seeders;
 
+use EscolaLms\Core\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -15,7 +16,7 @@ class PermissionTableSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $apiAdmin = Role::findOrCreate('admin', 'api');
+        $apiAdmin = Role::findOrCreate(UserRole::ADMIN, 'api');
         $permissions = ['delete templates', 'create templates', 'update templates', 'list templates'];
 
         foreach ($permissions as $permission) {
