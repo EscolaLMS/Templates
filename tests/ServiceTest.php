@@ -3,13 +3,11 @@
 namespace EscolaLms\Templates\Tests;
 
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-
 use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
 use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use EscolaLms\Templates\Tests\TestCase;
 use InvalidArgumentException;
 
 class ServiceTest extends TestCase

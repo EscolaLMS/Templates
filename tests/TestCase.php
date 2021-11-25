@@ -2,15 +2,12 @@
 
 namespace EscolaLms\Templates\Tests;
 
-use EscolaLms\Core\Models\User;
-use EscolaLms\Templates\AuthServiceProvider;
+use EscolaLms\Core\Enums\UserRole;
 use EscolaLms\Templates\Database\Seeders\PermissionTableSeeder;
 use EscolaLms\Templates\EscolaLmsTemplatesServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\PassportServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-use EscolaLms\Templates\Services\VariablesService;
 
 class TestCase extends \EscolaLms\Core\Tests\TestCase
 {
@@ -22,21 +19,15 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         parent::setUp();
         $this->seed(PermissionTableSeeder::class);
-        /*
-        $variablesService = resolve(VariablesServiceContract::class);
-        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
-        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
-        */
     }
 
     protected function getPackageProviders($app): array
     {
         return [
             ...parent::getPackageProviders($app),
-            EscolaLmsTemplatesServiceProvider::class,
             PassportServiceProvider::class,
             PermissionServiceProvider::class,
-            AuthServiceProvider::class
+            EscolaLmsTemplatesServiceProvider::class,
         ];
     }
 
@@ -50,6 +41,6 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     {
         $this->user = config('auth.providers.users.model')::factory()->create();
         $this->user->guard_name = 'api';
-        $this->user->assignRole('admin');
+        $this->user->assignRole(UserRole::ADMIN);
     }
 }
