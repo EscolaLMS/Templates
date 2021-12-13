@@ -7,33 +7,36 @@
 [![downloads](https://img.shields.io/packagist/v/escolalms/templates)](https://packagist.org/packages/escolalms/templates)
 [![downloads](https://img.shields.io/packagist/l/escolalms/templates)](https://packagist.org/packages/escolalms/templates)
 
-General purpose of this package is to store in database various templates.
-
-So far this is a straightforward implementation that use [strtr](https://www.php.net/manual/en/function.strtr.php).
+General purpose of this package is to store various templates in database and assigning them to Events so that content based on these templates is automatically generated and/or sent to users.
 
 Each template is defined by
 
-- `type`: so far Email or PDF
-- `vars_set`: which variable set it contains
-- `validation`: eg. Confirmation email must contain Confirmation URL Link.
+- `channel`: class defining how the template is handled
+- `event`: event to which the template is assigned
 
-There is and example in [tests](tests/Enum) for overall analysis how does this package works.
+For every channel & event pair a single Variables definition is registered, which contains tokens that can be used in the template and replaced with values based on the data from the Event.
 
-## Variable Set
+Analysing these three example files in [tests](tests/Mock):
 
-This package has no Variable Set. Each of this is defined be another package
+- TestChannel.php
+- TestVariables.php
+- TestEventWithGetters.php
+
+and looking at the `Template` facade is simplest way to understand how this package works.
+
+## Facade
+
+There is a `Template` facade declared, which is used to register Event-Channel-Variable sets and can be used in testing (as it can be replaced with a fake using `Template::fake()`).
+
+To register Event-Channel-Variable set, `Template::register($eventClass, $channelClass, $variableClass)` must be called, where:
+
+- `$eventClass` can be any class that is dispatched as an event in any EscolaLms package
+- `$channelClass` must be a class implementing `TemplateChannelContract` interface declared in this package
+- `$variableClass` must be a class implementing `TemplateVariableContract` interface declared in this package
+
+## Channels & variables
+
+This package has no Channels or Variables defined, everything should be created in separate packages.
 
 - [Templates-Email](https://github.com/EscolaLMS/Templates-Email)
 - [Templates-Certificates](https://github.com/EscolaLMS/Templates-Certificates)
-
-## Papeteer to generate PDF
-
-Best result generating PDF from HTML is by using headless chromium like papeteer.
-Caveat is that is does require installing Node.js and many binaries. This package use [spatie/browsershot](https://github.com/spatie/browsershot).
-Full list of installation requirements can be found on [their documentation](https://github.com/spatie/browsershot#requirements).
-Our [Docker PHP images](https://hub.docker.com/r/escolalms/php) have this preinstalled already.
-
-## Email Templates
-
-By default Laravel store email templates in blade files which is fine in most cases. Yet in Escola LMS we want to give administrators
-ability to manage content of the templates and store them in DB instead of `*.blade.php` files.
