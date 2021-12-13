@@ -26,29 +26,29 @@ class TemplateFake extends TemplateEventService implements TemplateEventServiceC
 
     public function handleEvent(EventWrapper $event): void
     {
-        if (array_key_exists($event->eventClass(), self::$templates)) {
-            foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
-                if ($variableClass::assignableClass()) {
-                    $template = $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
-                } else {
-                    $template = $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
-                }
-                if ($template && $template->is_valid) {
-                    $variables = $variableClass::variablesFromEvent($event);
-                    $sections = $template->generateContent($variables);
-                    if ($this->channelService->validateTemplateSections($channelClass, $sections)) {
-                        $eventData = [
-                            'eventClass' => $event->eventClass(),
-                            'channelClass' => $channelClass,
-                            'variableClass' => $variableClass,
-                            'event' => $event,
-                            'variables' => $variables,
-                            'template_name' => $template->name,
-                            'template_id' => $template->getKey(),
-                            'sections' => $sections,
-                        ];
-                        $this->handledEvents->push($eventData);
-                    }
+        if (!array_key_exists($event->eventClass(), self::$templates)) {
+            return;
+        }
+
+        foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
+            $template = $this->getCorrectTemplate($event, $channelClass, $variableClass);
+
+            if ($template && $template->is_valid) {
+                $variables = $variableClass::variablesFromEvent($event);
+                $sections = $template->generateContent($variables);
+
+                if ($this->channelService->validateTemplateSections($channelClass, $sections)) {
+                    $eventData = [
+                        'eventClass' => $event->eventClass(),
+                        'channelClass' => $channelClass,
+                        'variableClass' => $variableClass,
+                        'event' => $event,
+                        'variables' => $variables,
+                        'template_name' => $template->name,
+                        'template_id' => $template->getKey(),
+                        'sections' => $sections,
+                    ];
+                    $this->handledEvents->push($eventData);
                 }
             }
         }

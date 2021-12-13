@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
@@ -83,30 +84,40 @@ class TemplateEventService implements TemplateEventServiceContract
 
     public function handleEvent(EventWrapper $event): void
     {
-        if (array_key_exists($event->eventClass(), self::$templates)) {
-            foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
-                if ($variableClass::assignableClass()) {
-                    $template = $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
-                } else {
-                    $template = $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
-                }
-                if (!$template) {
-                    Log::error(__('Template not found when handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass]));
-                    continue;
-                }
-                if (!$template->is_valid) {
-                    Log::error(__('Template is invalid for handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
-                    continue;
-                }
-                $variables = $variableClass::variablesFromEvent($event);
-                $sections = $template->generateContent($variables);
-                if (!$this->channelService->validateTemplateSections($channelClass, $sections)) {
-                    Log::error(__('Template sections evaluate to incorrect types', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
-                    continue;
-                }
-                $channelClass::send($event, $sections);
-            }
+        if (!array_key_exists($event->eventClass(), self::$templates)) {
+            return;
         }
+
+        foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
+            $template = $this->getCorrectTemplate($event, $channelClass, $variableClass);
+
+            if (!$template) {
+                Log::error(__('Template not found when handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass]));
+                continue;
+            }
+            if (!$template->is_valid) {
+                Log::error(__('Template is invalid for handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
+                continue;
+            }
+
+            $variables = $variableClass::variablesFromEvent($event);
+            $sections = $template->generateContent($variables);
+
+            if (!$this->channelService->validateTemplateSections($channelClass, $sections)) {
+                Log::error(__('Template sections evaluate to incorrect types', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
+                continue;
+            }
+
+            $channelClass::send($event, $sections);
+        }
+    }
+
+    protected function getCorrectTemplate(EventWrapper $event, string $channelClass, string $variableClass): ?Template
+    {
+        if ($variableClass::assignableClass()) {
+            return $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
+        }
+        return $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
     }
 
     public function createDefaultTemplatesForChannel(string $channelClass): void
