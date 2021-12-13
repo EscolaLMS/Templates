@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class TemplateEventService implements TemplateEventServiceContract
 {
-    protected static array $templates = [];
+    protected array $templates = [];
 
     protected TemplateRepositoryContract $repository;
     protected TemplateChannelServiceContract $channelService;
@@ -33,25 +33,25 @@ class TemplateEventService implements TemplateEventServiceContract
         $this->channelService->register($channelClass);
         $this->variableService->registerForChannel($variableClass, $channelClass);
 
-        if (!array_key_exists($eventClass, self::$templates) || !array_key_exists($channelClass, self::$templates[$eventClass])) {
-            self::$templates[$eventClass][$channelClass] = $variableClass;
+        if (!array_key_exists($eventClass, $this->templates) || !array_key_exists($channelClass, $this->templates[$eventClass])) {
+            $this->templates[$eventClass][$channelClass] = $variableClass;
         }
     }
 
     public function getVariableClassName(string $eventClass, string $channelClass): ?string
     {
-        return self::$templates[$eventClass][$channelClass] ?? null;
+        return $this->templates[$eventClass][$channelClass] ?? null;
     }
 
     public function getRegisteredEvents(): array
     {
-        return self::$templates;
+        return $this->templates;
     }
 
     public function getRegisteredEventsWithTokens(): array
     {
         $result = [];
-        foreach (self::$templates as $event => $channels) {
+        foreach ($this->templates as $event => $channels) {
             foreach ($channels as $channel => $variableClass) {
                 $sections = [];
                 $requiredVariables = [];
@@ -84,11 +84,11 @@ class TemplateEventService implements TemplateEventServiceContract
 
     public function handleEvent(EventWrapper $event): void
     {
-        if (!array_key_exists($event->eventClass(), self::$templates)) {
+        if (!array_key_exists($event->eventClass(), $this->templates)) {
             return;
         }
 
-        foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
+        foreach ($this->templates[$event->eventClass()] as $channelClass => $variableClass) {
             $template = $this->getCorrectTemplate($event, $channelClass, $variableClass);
 
             if (!$template) {
@@ -122,7 +122,7 @@ class TemplateEventService implements TemplateEventServiceContract
 
     public function createDefaultTemplatesForChannel(string $channelClass): void
     {
-        foreach (self::$templates as $eventClass => $channels) {
+        foreach ($this->templates as $eventClass => $channels) {
             if (array_key_exists($channelClass, $channels)) {
                 $variableClass = $channels[$channelClass];
                 $template = $this->repository->findTemplateDefault($eventClass, $channelClass);

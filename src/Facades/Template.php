@@ -5,6 +5,7 @@ namespace EscolaLms\Templates\Facades;
 use EscolaLms\Templates\Testing\TemplateFake;
 use Illuminate\Support\Facades\Facade;
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
 
 /**
  * @method static void    register(string $eventClass, string $channelClass, string $variableClass)
@@ -24,7 +25,10 @@ class Template extends Facade
      */
     public static function fake()
     {
-        static::swap($fake = app(TemplateFake::class));
+        $fake = app(TemplateFake::class);
+        $fake->setRegisteredEvents(self::getRegisteredEvents());
+
+        static::swap($fake);
 
         return $fake;
     }
@@ -34,6 +38,6 @@ class Template extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return 'escolalms-facade-templates';
+        return TemplateEventServiceContract::class;
     }
 }

@@ -35,10 +35,6 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
     {
         $this->app->register(AuthServiceProvider::class);
 
-        $this->app->singleton('escolalms-facade-templates', function ($app) {
-            return app(TemplateEventService::class);
-        });
-
         Event::listen('EscolaLms*', function ($eventName, array $data) {
             app(TemplateEventListener::class)->handle($data[0]);
         });

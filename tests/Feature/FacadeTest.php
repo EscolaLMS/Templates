@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Tests\Feature;
 
+use BadMethodCallException;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Facades\Template;
@@ -14,6 +15,7 @@ use EscolaLms\Templates\Tests\Mock\TestEventWithToArray;
 use EscolaLms\Templates\Tests\Mock\TestVariables;
 use EscolaLms\Templates\Tests\Mock\TestVariablesWithMissingDefaultContent;
 use EscolaLms\Templates\Tests\TestCase;
+use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class FacadeTest extends TestCase
@@ -101,10 +103,12 @@ class FacadeTest extends TestCase
         Template::register(TestEventUnusable::class, TestChannel::class, TestVariables::class);
         Template::createDefaultTemplatesForChannel(TestChannel::class);
         Template::fake();
+        $this->expectException(BadMethodCallException::class);
         try {
             event(new TestEventUnusable($user));
         } catch (\Throwable $th) {
             $this->assertEquals('Call to undefined method EscolaLms\Templates\Events\EventWrapper::getFriend()', $th->getMessage());
+            throw $th;
         }
     }
 

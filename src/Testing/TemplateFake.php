@@ -9,6 +9,7 @@ use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use EscolaLms\Templates\Services\TemplateEventService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class TemplateFake extends TemplateEventService implements TemplateEventServiceContract
@@ -24,13 +25,18 @@ class TemplateFake extends TemplateEventService implements TemplateEventServiceC
         $this->handledEvents = new Collection();
     }
 
+    public function setRegisteredEvents(array $events): void
+    {
+        $this->templates = $events;
+    }
+
     public function handleEvent(EventWrapper $event): void
     {
-        if (!array_key_exists($event->eventClass(), self::$templates)) {
+        if (!array_key_exists($event->eventClass(), $this->templates)) {
             return;
         }
 
-        foreach (self::$templates[$event->eventClass()] as $channelClass => $variableClass) {
+        foreach ($this->templates[$event->eventClass()] as $channelClass => $variableClass) {
             $template = $this->getCorrectTemplate($event, $channelClass, $variableClass);
 
             if ($template && $template->is_valid) {
