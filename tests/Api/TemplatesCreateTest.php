@@ -2,12 +2,15 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
-use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use EscolaLms\Templates\Models\TemplateSection;
+use EscolaLms\Templates\Tests\Mock\TestChannel;
+use EscolaLms\Templates\Tests\Mock\TestEventWithGetters;
+use EscolaLms\Templates\Tests\Mock\TestVariables;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Testing\TestResponse;
 
 class TemplatesCreateTest extends TestCase
 {
@@ -16,9 +19,7 @@ class TemplatesCreateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $variablesService = resolve(VariablesServiceContract::class);
-        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
-        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+        FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
     }
 
     private function uri(string $suffix): string
@@ -29,23 +30,29 @@ class TemplatesCreateTest extends TestCase
     public function testAdminCanCreateTemplate()
     {
         $this->authenticateAsAdmin();
-        $template = Template::factory()->makeOne(['name' => 'false']);
-        $template->type = 'pdf';
-        $template->vars_set = 'certificates';
-        $template->content .= PdfCertificateVar::STUDENT_EMAIL;
+        $template = Template::factory()->makeOne();
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
+
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+            TemplateSection::factory(['key' => 'content', 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge($template->toArray(), ['sections' => $sections]);
 
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
-            $template->toArray()
+            $data
         );
 
         $response->assertStatus(201);
 
-        $response3 = $this->actingAs($this->user, 'api')->getJson(
+        $response2 = $this->actingAs($this->user, 'api')->getJson(
             '/api/admin/templates/' . $template->id,
         );
 
-        $response3->assertOk();
+        $response2->assertOk();
     }
 
     public function testAdminCannotCreateTemplateWithoutTitle()
@@ -53,11 +60,24 @@ class TemplatesCreateTest extends TestCase
         $this->authenticateAsAdmin();
 
         $template = Template::factory()->makeOne();
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
+
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+            TemplateSection::factory(['key' => 'content', 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge(collect($template->getAttributes())->except('id', 'name', 'type')->toArray(), ['sections' => $sections]);
+
+        /** @var TestResponse $response */
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
-            collect($template->getAttributes())->except('id', 'name', 'type')->toArray()
+            $data
         );
         $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('name');
+
         $response = $this->getJson(
             '/api/templates/' . $template->id,
         );
@@ -65,19 +85,53 @@ class TemplatesCreateTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function testAdminCannotCreateTemplateWithInvalidContent()
+    public function testAdminCannotCreateTemplateWithMissingSection()
     {
         $this->authenticateAsAdmin();
-
         $template = Template::factory()->makeOne();
-        $template->type = 'pdf';
-        $template->vars_set = 'certificates';
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
 
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge($template->toArray(), ['sections' => $sections]);
+
+        /** @var TestResponse $response */
         $response = $this->actingAs($this->user, 'api')->postJson(
             '/api/admin/templates',
-            $template->getAttributes()
+            $data
         );
+
         $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('sections');
+        $response->assertJsonValidationErrors(['sections' => 'Required section: content']);
+    }
+
+    public function testAdminCannotCreateTemplateWithMissingVariablesInSection()
+    {
+        $this->authenticateAsAdmin();
+        $template = Template::factory()->makeOne();
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
+
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+            TemplateSection::factory(['key' => 'content'])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge($template->toArray(), ['sections' => $sections]);
+
+        /** @var TestResponse $response */
+        $response = $this->actingAs($this->user, 'api')->postJson(
+            '/api/admin/templates',
+            $data
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('sections');
+        $response->assertJsonValidationErrors(['sections' => 'Required variables in section: content [@VarUserEmail, @VarFriendEmail]']);
     }
 
     public function testGuestCannotCreateTemplate()

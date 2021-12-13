@@ -2,8 +2,9 @@
 
 namespace EscolaLms\Templates\Rules;
 
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 
@@ -11,13 +12,16 @@ class TemplateValidContentRule implements Rule
 {
     private ?Template $template;
     private Request $request;
-    private VariablesServiceContract $variableService;
+    private TemplateVariablesServiceContract $templateVariableService;
+
+    private array $missingSections = [];
+    private array $missingVariables = [];
 
     public function __construct(?Template $template = null)
     {
         $this->template = $template;
         $this->request = request();
-        $this->variableService = app(VariablesServiceContract::class);
+        $this->templateVariableService = app(TemplateVariablesServiceContract::class);
     }
 
     /**
@@ -29,12 +33,32 @@ class TemplateValidContentRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if (!$this->template || ($this->request->has('type') && $this->request->has('vars_set'))) {
-            $templateVariableClass = $this->variableService->getVariableEnumClassName($this->request->input('type'), $this->request->input('vars_set'));
+        if (!$this->template || ($this->request->has('event') && $this->request->has('channel'))) {
+            $templateVariableClass = FacadesTemplate::getVariableClassName($this->request->input('event'), $this->request->input('channel'));
+            $channelClass = $this->request->input('channel');
         } else {
-            $templateVariableClass = $this->variableService->getVariableEnumClassName($this->template->type, $this->template->vars_set);
+            $templateVariableClass = FacadesTemplate::getVariableClassName($this->template->event, $this->template->channel);
+            $channelClass = $this->template->channel;
         }
-        return $templateVariableClass::isValid($value);
+
+        $allContent = '';
+        $allSections = [];
+
+        foreach ($value as $section) {
+            $allSections[] = $section['key'];
+            $allContent .= $section['content'] . ' ';
+            if (!$this->templateVariableService->sectionIsValid($templateVariableClass, $section['key'], $section['content'])) {
+                $this->missingVariables[$section['key']] = $this->templateVariableService->missingVariablesInSection($templateVariableClass, $section['key'], $section['content']);
+            }
+        }
+
+        foreach ($this->templateVariableService->requiredSectionsForChannel($templateVariableClass, $channelClass) as $section) {
+            if (!in_array($section, $allSections)) {
+                $this->missingSections[] = $section;
+            }
+        }
+
+        return empty($this->missingVariables) && empty($this->missingSections) && $this->templateVariableService->contentIsValidForChannel($templateVariableClass, $channelClass, $allContent);
     }
 
     /**
@@ -44,6 +68,13 @@ class TemplateValidContentRule implements Rule
      */
     public function message()
     {
-        return __('The :attribute must contain all required variables.');
+        $msg = '';
+        foreach ($this->missingVariables as $section => $variables) {
+            $msg .= __('Required variables in section: ' . $section . ' [' . implode(', ', $variables) . ']') . PHP_EOL;
+        }
+        foreach ($this->missingSections as $section) {
+            $msg .= __('Required section: ' . $section) . PHP_EOL;
+        }
+        return $msg;
     }
 }

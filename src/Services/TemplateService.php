@@ -2,24 +2,23 @@
 
 namespace EscolaLms\Templates\Services;
 
-use EscolaLms\Templates\Mail\TemplatePreview;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
+use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Browsershot\Browsershot;
+use InvalidArgumentException;
 
 class TemplateService implements TemplateServiceContract
 {
-    private TemplateRepositoryContract $repository;
-    private VariablesServiceContract $variableService;
+    protected TemplateRepositoryContract $repository;
+    protected TemplateVariablesServiceContract $variableService;
 
-    public function __construct(TemplateRepositoryContract $repository, VariablesServiceContract $variableService)
-    {
+    public function __construct(
+        TemplateRepositoryContract $repository,
+        TemplateVariablesServiceContract $variableService
+    ) {
         $this->repository = $repository;
         $this->variableService = $variableService;
     }
@@ -36,12 +35,14 @@ class TemplateService implements TemplateServiceContract
 
     public function insert(array $data): Template
     {
-        /** @var Template $template */
-        $template = new Template();
-        $template->fill($data);
-        $this->repository->insert($template);
-
-        return $template;
+        if (array_key_exists('sections', $data) && !empty($data['sections'])) {
+            foreach ($data['sections'] as $section) {
+                $sections[$section['key']] = $section['content'];
+            }
+            unset($data['sections']);
+            return $this->repository->createWithSections($data, $sections);
+        }
+        return  $this->repository->create($data);
     }
 
     public function deleteById(int $id): bool
@@ -51,89 +52,81 @@ class TemplateService implements TemplateServiceContract
 
     public function update(int $id, array $data): Template
     {
+        if (array_key_exists('sections', $data) && !empty($data['sections'])) {
+            foreach ($data['sections'] as $section) {
+                $sections[$section['key']] = $section['content'];
+            }
+            unset($data['sections']);
+            return $this->repository->updateWithSections($data, $sections, $id);
+        }
         return $this->repository->update($data, $id);
-    }
-
-    public function generatePDF(Template $template, array $vars): string
-    {
-        $content = strtr($template->content, $vars);
-        $content = view('templates::ckeditor', ['body' => $content])->render();
-        $filename = 'generated-' . uniqid() . '.pdf';
-        Browsershot::html($content)
-            ->addChromiumArguments([
-                'no-sandbox',
-                'disable-setuid-sandbox',
-                'disable-dev-shm-usage',
-                'single-process'
-            ])
-            ->timeout(120)
-            ->save($filename);
-        return $filename;
-    }
-
-    public function createPreview(Template $template): array
-    {
-        $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
-        $vars = $enum::getMockVariables();
-
-        $content = strtr($template->content, $vars);
-        $result = ['content' => $content];
-        switch ($template->type) {
-            case "pdf":
-                $content = view('templates::ckeditor', ['body' => $content])->render();
-                $result = $this->previewPDF($content);
-                break;
-            case "email":
-                $content = view('templates::email', ['body' => $content])->render();
-                $result = $this->previewEmail($content);
-                break;
-        }
-
-
-        return $result;
-    }
-
-    private function previewEmail($markup, string $email = null): array
-    {
-        if (empty($email)) {
-            $user = Auth::user();
-            $email = $user->email;
-        }
-
-        Mail::to($email)->send(new TemplatePreview($markup));
-        return [
-            'sent' => true,
-            'to' => $email
-        ];
-    }
-
-    private function previewPDF($markup): array
-    {
-        $filename = 'preview-' . uniqid() . '.pdf';
-
-        $dir = Storage::disk('local')->makeDirectory('tmp_pdfs/');
-        $path = Storage::disk('local')->path('tmp_pdfs/' . $filename);
-        $url = Storage::disk('local')->url('tmp_pdfs/' . $filename);
-
-        Browsershot::html($markup)
-            ->addChromiumArguments([
-                'no-sandbox',
-                'disable-setuid-sandbox',
-                'disable-dev-shm-usage',
-                'single-process'
-            ])
-            ->timeout(120)
-            ->save($path);
-
-        return [
-            'filename' => $filename,
-            'url' => $url
-        ];
     }
 
     public function isValid(Template $template): bool
     {
-        $enum = $this->variableService->getVariableEnumClassName($template->type, $template->vars_set);
-        return $enum::isValid($template->content);
+        $channelClass = $template->channel;
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
+
+        if (!$variableClass) {
+            return false;
+        }
+
+        $existingSections = [];
+        foreach ($template->sections->pluck('content', 'key') as $key => $content) {
+            if (!empty($content)) {
+                $existingSections[$key] = $content;
+            }
+        }
+
+        $requiredSections = array_merge($variableClass::requiredSections(), $channelClass::sectionsRequired());
+        foreach ($requiredSections as $section) {
+            if (!in_array($section, array_keys($existingSections))) {
+                return false;
+            }
+        }
+
+        $allContent = implode($existingSections);
+        if (!$this->variableService->contentIsValidForChannel($variableClass, $channelClass, $allContent)) {
+            return false;
+        }
+
+        foreach ($existingSections as $key => $content) {
+            if (!$this->variableService->sectionIsValid($variableClass, $key, $content)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function generateContentUsingVariables(Template $template, array $variables): array
+    {
+        $results = [];
+        foreach ($template->sections as $section) {
+            $results[$section['key']] = strtr($section->content, $variables);
+        }
+        return $results;
+    }
+
+    public function createPreview(Template $template): array
+    {
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
+        return $this->generateContentUsingVariables($template, $variableClass::mockedVariables());
+    }
+
+    public function assignTemplateToModel(Template $template, ?int $assignable_id = null): Template
+    {
+        if (is_null($assignable_id)) {
+            $template->assignable()->disassociate();
+        } else {
+            $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
+            $assignableClass = $variableClass::assignableClass();
+            if (class_exists($assignableClass)) {
+                $assignable = $assignableClass::findOrFail($assignable_id);
+                $template->assignable()->associate($assignable);
+            }
+        }
+        $template->save();
+        return $template->refresh();
     }
 }

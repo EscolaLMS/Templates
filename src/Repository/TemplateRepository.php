@@ -4,8 +4,10 @@ namespace EscolaLms\Templates\Repository;
 
 use EscolaLms\Core\Repositories\BaseRepository;
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 
 class TemplateRepository extends BaseRepository implements TemplateRepositoryContract
 {
@@ -16,7 +18,14 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
 
     public function getFieldsSearchable()
     {
-        return [];
+        return [
+            'name',
+            'channel',
+            'event',
+            'default',
+            'assignable_type',
+            'assignable_id',
+        ];
     }
 
     public function searchAndPaginate(array $search = [], ?int $perPage = null, string $orderDirection = 'asc', string $orderColumn = 'id'): LengthAwarePaginator
@@ -24,26 +33,64 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
         return $this->allQuery($search)->orderBy($orderColumn, $orderDirection)->paginate($perPage);
     }
 
-    /**
-     * @param Template $template
-     * @return Template
-     */
-    public function insert(Template $template): Template
-    {
-        return $this->createUsingModel($template);
-    }
-
-    /**
-     * @param int $id
-     * @return bool
-     */
     public function deleteTemplate(int $id): bool
     {
+        /** @var Template $template */
         $template = $this->find($id);
+
         if (!$template) {
             return false;
         }
 
+        $template->sections()->delete();
         return $template->delete();
+    }
+
+    public function findTemplateDefault(string $event, string $channel): ?Template
+    {
+        return $this->allQuery([
+            'event' => $event,
+            'channel' => $channel,
+            'default' => true,
+        ])->first();
+    }
+
+    public function findTemplateAssigned(string $event, string $channel, string $assigned_class, ?int $assigned_value): ?Template
+    {
+        if (is_a($assigned_class, Model::class, true) && !is_null($assigned_value)) {
+            $template = $this->allQuery([
+                'event' => $event,
+                'channel' => $channel,
+                'assignable_type' => (new $assigned_class())->getMorphClass(),
+                'assignable_id' => $assigned_value,
+            ])->first();
+        }
+        if (!$template) {
+            $template = $this->findTemplateDefault($event, $channel);
+        }
+        return $template;
+    }
+
+    public function createWithSections(array $attributes, array $sections): Template
+    {
+        /** @var Template $template */
+        $template = $this->create($attributes);
+        foreach ($sections as $section => $content) {
+            $template->sections()->save(new TemplateSection([
+                'key' => $section,
+                'content' => $content,
+            ]));
+        }
+        return $template;
+    }
+
+    public function updateWithSections(array $attributes, array $sections, int $id): Template
+    {
+        /** @var Template $template */
+        $template = $this->update($attributes, $id);
+        foreach ($sections as $section => $content) {
+            $section = TemplateSection::updateOrCreate(['template_id' => $template->getKey(), 'key' => $section], ['content' => $content]);
+        }
+        return $template;
     }
 }

@@ -34,8 +34,6 @@ class TemplatesDeleteTest extends TestCase
 
         $response = $this->actingAs($this->user, 'api')->delete($this->uri($template->id));
 
-
-
         $response->assertStatus(404);
     }
 
