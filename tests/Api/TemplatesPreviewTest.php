@@ -89,7 +89,6 @@ class TemplatesPreviewTest extends TestCase
 
     public function testAdminCanPreviewTemplateData()
     {
-        Template::truncate();
         FacadesTemplate::createDefaultTemplatesForChannel(TestChannel::class);
         $template = Template::whereDefault(true)->whereChannel(TestChannel::class)->whereEvent(TestEventWithGetters::class)->first();
 
