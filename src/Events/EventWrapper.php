@@ -2,10 +2,11 @@
 
 namespace EscolaLms\Templates\Events;
 
+use EscolaLms\Core\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use ReflectionClass;
 
 class EventWrapper
 {
@@ -18,28 +19,37 @@ class EventWrapper
         $this->event = $event;
     }
 
-    /**
-     * Event should have methods declared for retrieving its data, 
-     * for example Course related event should have getCourse() method, 
-     * but if it does not, we can try to extract 'course' property of the object 
-     * (either from toArray method or by using Reflection)
-     */
-    public function __call($name, $arguments)
-    {
-        if (Str::startsWith($name, 'get') && !method_exists($this->event, $name)) {
-            $field = Str::lower(Str::after($name, 'get'));
-            $array = $this->toArray();
-            if (array_key_exists($field, $array)) {
-                return $array[$field];
-            }
-        }
-
-        return $this->forwardCallTo($this->event, $name, $arguments);
-    }
-
     public function eventClass(): string
     {
         return get_class($this->event);
+    }
+
+    public function user(): ?User
+    {
+        try {
+            $result = $this->__call('getUser', []);
+            if ($result instanceof User) {
+                return $result;
+            }
+            if (is_numeric($result)) {
+                return User::find($result);
+            }
+        } catch (\BadMethodCallException $ex) {
+            // ignore
+        }
+        if (method_exists($this->event, 'toArray')) {
+            foreach ($this->event->toArray() as $key => $value) {
+                if ($value instanceof User) {
+                    return $value->getKey();
+                }
+            }
+        }
+        foreach ($this->extractPropertiesFromBaseEvent() as $key => $value) {
+            if ($value instanceof User) {
+                return $value->getKey();
+            }
+        }
+        return null;
     }
 
     public function assignable(string $class): ?int
@@ -67,6 +77,25 @@ class EventWrapper
             }
         }
         return null;
+    }
+
+    /**
+     * Event should have methods declared for retrieving its data, 
+     * for example Course related event should have getCourse() method, 
+     * but if it does not, we can try to extract 'course' property of the object 
+     * (either from toArray method or by using Reflection)
+     */
+    public function __call($name, $arguments)
+    {
+        if (Str::startsWith($name, 'get') && !method_exists($this->event, $name)) {
+            $field = Str::lower(Str::after($name, 'get'));
+            $array = $this->toArray();
+            if (array_key_exists($field, $array)) {
+                return $array[$field];
+            }
+        }
+
+        return $this->forwardCallTo($this->event, $name, $arguments);
     }
 
     public function toArray(): array
