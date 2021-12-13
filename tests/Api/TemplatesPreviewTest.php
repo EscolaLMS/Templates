@@ -2,14 +2,14 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
-use EscolaLms\Templates\Mail\TemplatePreview;
+use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
-use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
+use EscolaLms\Templates\Tests\Mock\TestChannel;
+use EscolaLms\Templates\Tests\Mock\TestEventWithGetters;
+use EscolaLms\Templates\Tests\Mock\TestVariables;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Mail;
 
 class TemplatesPreviewTest extends TestCase
 {
@@ -18,9 +18,26 @@ class TemplatesPreviewTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $variablesService = resolve(VariablesServiceContract::class);
-        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
-        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+        Template::truncate();
+        FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
+        FacadesTemplate::createDefaultTemplatesForChannel(TestChannel::class);
+    }
+
+    public function testAdminCanListRegisteredEvents()
+    {
+        $this->authenticateAsAdmin();
+        $response = $this->actingAs($this->user, 'api')->getJson(
+            '/api/admin/templates/events'
+        );
+
+        $response->assertOk();
+
+        $json = $response->json();
+        $variables = $json['data'];
+
+        $this->assertTrue(isset($variables[TestEventWithGetters::class]));
+        $this->assertTrue(isset($variables[TestEventWithGetters::class][TestChannel::class]));
+        $this->assertEquals(TestVariables::class, $variables[TestEventWithGetters::class][TestChannel::class]);
     }
 
     public function testAdminCanListVariables()
@@ -35,77 +52,57 @@ class TemplatesPreviewTest extends TestCase
         $json = $response->json();
         $variables = $json['data'];
 
-        $this->assertTrue(isset($variables['email']['certificates']));
-        $this->assertTrue(isset($variables['pdf']['certificates']));
-        $this->assertIsArray($variables['email']['certificates']);
-        $this->assertIsArray($variables['pdf']['certificates']);
+        $this->assertEquals([
+            "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
+            'assignableClass' => null,
+            "variables" =>  [
+                0 => "@VarUserEmail",
+                1 => "@VarFriendEmail"
+            ],
+            "required_variables" =>  [
+                0 => "@VarUserEmail",
+                1 => "@VarFriendEmail"
+            ],
+            "sections" => [
+                "title" => [
+                    "type" => TemplateSectionTypeEnum::SECTION_TEXT,
+                    "required" => true,
+                    "default_content" => "New friend request",
+                    "required_variables" => []
+                ],
+                "content" =>  [
+                    "type" => TemplateSectionTypeEnum::SECTION_HTML,
+                    "required" => true,
+                    "default_content" => '<h1>Hello @VarUserEmail!</h1><br/>' . PHP_EOL . '<p>You have new friend request from @VarFriendEmail</p>',
+                    "required_variables" => [
+                        0 => "@VarUserEmail",
+                        1 => "@VarFriendEmail"
+                    ]
+                ],
+                "url" => [
+                    "type" => TemplateSectionTypeEnum::SECTION_URL,
+                    "required" => false,
+                    "default_content" => "",
+                    "required_variables" => []
+                ]
+            ]
+        ], $variables[TestEventWithGetters::class][TestChannel::class]);
     }
 
-    public function testAdminCanCreateEmailPreview()
+    public function testAdminCanPreviewTemplateData()
     {
+        $template = Template::whereDefault(true)->whereChannel(TestChannel::class)->whereEvent(TestEventWithGetters::class)->first();
+
         $this->authenticateAsAdmin();
-        $template = Template::factory()->makeOne([
-            'type' => 'email',
-            'vars_set' => 'certificates',
-            'content' => <<<EOT
-                            <h1>@VarCourseTitle</h1>
-                            <a href="mailto:@VarStudentEmail">@VarStudentEmail</a>
-                            <code>HelloWorld</code>
-                            <date>@VarDateFinished</date>
-                            EOT
-        ]);
-        $response = $this->actingAs($this->user, 'api')->postJson(
-            '/api/admin/templates',
-            $template->toArray()
-        );
 
-        $response->assertStatus(201);
-
-        $id = $response->getData()->data->id;
-
-        Mail::fake();
-
-        $response = $this->actingAs($this->user, 'api')->get(
-            '/api/admin/templates/' . $id . '/preview',
-            $template->toArray()
+        $response = $this->actingAs($this->user, 'api')->getJson(
+            '/api/admin/templates/' . $template->getKey() . '/preview'
         );
 
         $response->assertOk();
-
-        Mail::assertSent(TemplatePreview::class);
-
-        Mail::assertSent(function (TemplatePreview $mail) {
-            return strpos($mail->markdown, '<code>HelloWorld</code>') !== false;
-        });
-
-        Mail::assertSent(function (TemplatePreview $mail) {
-            $date = preg_match_all('/<date>(.*?)<\/date>/s', $mail->markdown, $matches);
-            return strtotime($matches[1][0]) !== false;
-        });
-    }
-
-    public function testAdminCanCreatePDFPreview()
-    {
-        $this->authenticateAsAdmin();
-        $template = Template::factory()->makeOne([
-            'type' => 'pdf',
-            'vars_set' => 'certificates',
-            'content' => 'Course: ' . PdfCertificateVar::STUDENT_EMAIL . '<br />Date course was finished: @VarDateFinished'
+        $response->assertJsonFragment([
+            'title' => TestVariables::defaultSectionsContent()['title'],
+            'content' => strtr(TestVariables::defaultSectionsContent()['content'], TestVariables::mockedVariables())
         ]);
-        $response = $this->actingAs($this->user, 'api')->postJson(
-            '/api/admin/templates',
-            $template->toArray()
-        );
-
-        $response->assertStatus(201);
-
-        $id = $response->getData()->data->id;
-
-        $response = $this->actingAs($this->user, 'api')->get(
-            '/api/admin/templates/' . $id . '/preview',
-            $template->toArray()
-        );
-
-        $response->assertOk();
     }
 }

@@ -4,9 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTemplatesTable extends Migration
+class CreateTemplateSectionsTable extends Migration
 {
-    private string $table = 'templates';
+    private string $table = 'template_sections';
 
     public function up()
     {
@@ -14,11 +14,9 @@ class CreateTemplatesTable extends Migration
             $this->table,
             function (Blueprint $table) {
                 $table->id('id');
-                $table->string('name');
-                $table->string('channel');
-                $table->string('event');
-                $table->boolean('default')->default(false);
-                $table->nullableMorphs('assignable');
+                $table->string('key');
+                $table->text('content');
+                $table->foreignId('template_id');
                 $table->timestamps();
             }
         );

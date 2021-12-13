@@ -2,11 +2,12 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
-use EscolaLms\Templates\Tests\Enum\Email\CertificateVar as EmailCertificateVar;
-use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar as PdfCertificateVar;
-use EscolaLms\Templates\Tests\Enum\Pdf\CertificateVar;
+use EscolaLms\Templates\Models\TemplateSection;
+use EscolaLms\Templates\Tests\Mock\TestChannel;
+use EscolaLms\Templates\Tests\Mock\TestEventWithGetters;
+use EscolaLms\Templates\Tests\Mock\TestVariables;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -17,9 +18,7 @@ class TemplatesUpdateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $variablesService = resolve(VariablesServiceContract::class);
-        $variablesService::addToken(EmailCertificateVar::class, 'email', 'certificates');
-        $variablesService::addToken(PdfCertificateVar::class, 'pdf', 'certificates');
+        FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
     }
 
     private function uri(int $id): string
@@ -31,22 +30,26 @@ class TemplatesUpdateTest extends TestCase
     {
         $this->authenticateAsAdmin();
 
-        $template = Template::factory()->createOne();
-        $templateNew = Template::factory()->makeOne();
-        $templateNew->content .= CertificateVar::STUDENT_EMAIL;
+        $template = Template::factory()->createOne([
+            'name' => 'old name',
+            'event' => TestEventWithGetters::class,
+            'channel' => TestChannel::class,
+        ]);
+
+        TemplateSection::factory(['key' => 'title', 'template_id' => $template->getKey()])->create();
+        TemplateSection::factory(['key' => 'content', 'template_id' => $template->getKey(), 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->create();
+
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
             [
-                'name' => $templateNew->name,
-                'content' => $templateNew->content,
+                'name' => 'new name',
             ]
         );
         $response->assertOk();
-        $template->refresh();
 
-        $this->assertEquals($templateNew->name, $template->name);
-        $this->assertEquals($templateNew->content, $template->content);
+        $template->refresh();
+        $this->assertEquals('new name', $template->name);
         $this->assertTrue($template->is_valid);
     }
 
@@ -54,48 +57,29 @@ class TemplatesUpdateTest extends TestCase
     {
         $this->authenticateAsAdmin();
 
-        $template = Template::factory()->createOne();
-        $templateNew = Template::factory()->makeOne();
-        $templateNew->content .= CertificateVar::STUDENT_EMAIL;
+        $template = Template::factory()->createOne([
+            'event' => TestEventWithGetters::class,
+            'channel' => TestChannel::class,
+        ]);
+        TemplateSection::factory(['key' => 'title', 'template_id' => $template->getKey()])->create();
+        $templateSection = TemplateSection::factory(['key' => 'content', 'template_id' => $template->getKey(), 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->create();
 
-        $oldName = $template->name;
-        $oldContent = $template->content;
+        $newSections = [
+            TemplateSection::factory(['key' => 'title', 'content' => 'new content'])->makeOne()->toArray(),
+            $templateSection->toArray(),
+        ];
 
         $response = $this->actingAs($this->user, 'api')->patchJson(
             $this->uri($template->id),
             [
-                'content' => $templateNew->content,
+                'sections' => $newSections,
             ]
         );
         $response->assertStatus(200);
-        $template->refresh();
 
-        $this->assertEquals($oldName, $template->name);
-        $this->assertEquals($templateNew->content, $template->content);
-        $this->assertNotEquals($oldContent, $templateNew->content);
+        $template->refresh();
+        $this->assertTrue($template->sections()->where('key', 'title')->where('content', 'new content')->exists());
         $this->assertTrue($template->is_valid);
-    }
-
-    public function testAdminCanUpdateExistingTemplateWithMissingContent()
-    {
-        $this->authenticateAsAdmin();
-
-        $template = Template::factory()->createOne();
-        $templateNew = Template::factory()->makeOne();
-        $oldName = $template->name;
-        $oldContent = $template->content;
-
-        $response = $this->actingAs($this->user, 'api')->patchJson(
-            $this->uri($template->id),
-            [
-                'name' => $templateNew->name,
-            ]
-        );
-        $response->assertStatus(200);
-        $template->refresh();
-
-        $this->assertEquals($templateNew->name, $template->name);
-        $this->assertEquals($oldContent, $template->content);
     }
 
     public function testAdminCannotUpdateMissingTemplate()

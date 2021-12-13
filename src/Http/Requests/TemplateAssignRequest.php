@@ -3,11 +3,10 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use EscolaLms\Templates\Models\Template;
-use EscolaLms\Templates\Rules\TemplateValidContentRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class TemplateUpdateRequest extends FormRequest
+class TemplateAssignRequest extends FormRequest
 {
     /**
      * @return bool
@@ -25,13 +24,7 @@ class TemplateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['sometimes', 'string'],
-            'channel' => ['sometimes', 'string'],
-            'event' => ['sometimes', 'string'],
-            'default' => ['sometimes', 'bool'],
-            'sections' => ['sometimes', 'array', new TemplateValidContentRule($this->getTemplate())],
-            'sections.*.key' => ['string'],
-            'sections.*.content' => ['string'],
+            'assignable_id' => ['required', 'int', 'nullable'],
         ];
     }
 

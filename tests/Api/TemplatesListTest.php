@@ -14,7 +14,6 @@ class TemplatesListTest extends TestCase
 
     public function testAdminCanListEmpty()
     {
-
         $this->authenticateAsAdmin();
 
         $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates');

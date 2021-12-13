@@ -3,26 +3,26 @@
 namespace EscolaLms\Templates\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Http\Controllers\Contracts\TemplatesAdminApiContract;
+use EscolaLms\Templates\Http\Requests\TemplateAssignRequest;
 use EscolaLms\Templates\Http\Requests\TemplateCreateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
 use EscolaLms\Templates\Http\Requests\TemplateListingRequest;
 use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Resources\TemplateResource;
-use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
-use EscolaLms\Templates\Services\Contracts\VariablesServiceContract;
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
+use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Exception;
 
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
-    private VariablesServiceContract $variablesService;
 
-    public function __construct(TemplateServiceContract $templateService, VariablesServiceContract $variablesService)
+    public function __construct(TemplateServiceContract $templateService, TemplateVariablesServiceContract $variablesService)
     {
         $this->templateService = $templateService;
         $this->variablesService = $variablesService;
@@ -69,9 +69,16 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         return $this->sendError(sprintf("template with id '%s' doesn't exists", $id), 404);
     }
 
+    public function events(TemplateReadRequest $request): JsonResponse
+    {
+        $vars = FacadesTemplate::getRegisteredEvents();
+
+        return $this->sendResponse($vars, "events and handlers fetched successfully");
+    }
+
     public function variables(TemplateReadRequest $request): JsonResponse
     {
-        $vars = $this->variablesService->getAvailableTokens();
+        $vars = FacadesTemplate::getRegisteredEventsWithTokens();
 
         return $this->sendResponse($vars, "template vars fetched successfully");
     }
@@ -83,5 +90,14 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         $preview = $this->templateService->createPreview($template);
 
         return $this->sendResponse($preview, "template preview fetched successfully");
+    }
+
+    public function assign(TemplateAssignRequest $request, $id): Response
+    {
+        $template = $request->getTemplate();
+
+        $this->templateService->assignTemplateToModel($template, $request->input('assignable_id'));
+
+        return $this->sendResponseForResource(TemplateResource::make($template));
     }
 }

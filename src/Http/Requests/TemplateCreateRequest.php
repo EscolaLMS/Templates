@@ -25,10 +25,13 @@ class TemplateCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['string'],
-            'vars_set' => ['string'],
-            'name' => ['string', 'required'],
-            'content' => ['string', 'required', new TemplateValidContentRule()],
+            'name' => ['required', 'string'],
+            'channel' => ['required', 'string'],
+            'event' => ['required', 'string'],
+            'default' => ['sometimes', 'bool'],
+            'sections' => ['required', 'array', new TemplateValidContentRule()],
+            'sections.*.key' => ['string'],
+            'sections.*.content' => ['string'],
         ];
     }
 }
