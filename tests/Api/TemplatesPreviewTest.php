@@ -18,9 +18,7 @@ class TemplatesPreviewTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Template::truncate();
         FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
-        FacadesTemplate::createDefaultTemplatesForChannel(TestChannel::class);
     }
 
     public function testAdminCanListRegisteredEvents()
@@ -91,6 +89,8 @@ class TemplatesPreviewTest extends TestCase
 
     public function testAdminCanPreviewTemplateData()
     {
+        Template::truncate();
+        FacadesTemplate::createDefaultTemplatesForChannel(TestChannel::class);
         $template = Template::whereDefault(true)->whereChannel(TestChannel::class)->whereEvent(TestEventWithGetters::class)->first();
 
         $this->authenticateAsAdmin();
