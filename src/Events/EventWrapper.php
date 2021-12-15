@@ -58,7 +58,10 @@ class EventWrapper
         try {
             $basename = class_basename($class);
             $result = $this->__call(Str::camel("get $basename"), []);
-            if (is_a($result, $class, true) || is_numeric($result)) {
+            if (is_a($result, $class, true)) {
+                return $result->getKey();
+            }
+            if (is_numeric($result)) {
                 return $result;
             }
         } catch (\BadMethodCallException $ex) {

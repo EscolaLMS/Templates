@@ -11,4 +11,5 @@ interface TemplateEventServiceContract
     public function handleEvent(EventWrapper $event): void;
     public function getRegisteredEvents(): array;
     public function getRegisteredEventsWithTokens(): array;
+    public function getRegisteredChannels(): array;
 }
