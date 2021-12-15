@@ -48,6 +48,11 @@ class TemplateEventService implements TemplateEventServiceContract
         return $this->templates;
     }
 
+    public function getRegisteredChannels(): array
+    {
+        return $this->channelService->list();
+    }
+
     public function getRegisteredEventsWithTokens(): array
     {
         $result = [];

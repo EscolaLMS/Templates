@@ -12,6 +12,7 @@ use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
  * @method static void    handleEvent(EventWrapper $event)
  * @method static ?string getVariableClassName(string $eventClass, string $channelClass)
  * @method static array   getRegisteredEvents()
+ * @method static array   getRegisteredChannels()
  * @method static array   getRegisteredEventsWithTokens()
  * @method static bool    assertEventHandled(string $eventClass, string $channelClass, ?string $variableClass = null) 
  * @method static void    createDefaultTemplatesForChannel(string $channelClass)

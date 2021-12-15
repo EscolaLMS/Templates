@@ -43,7 +43,7 @@ class TemplateVariablesService implements TemplateVariablesServiceContract
     private function validForChannel(string $variableClass, string $channelClass): bool
     {
         foreach ($variableClass::requiredSections() as $section) {
-            if (!in_array($section, $channelClass::sections())) {
+            if (!array_key_exists($section, $channelClass::sections())) {
                 // variable class can not require a section that does not exist in channel class
                 return false;
             }

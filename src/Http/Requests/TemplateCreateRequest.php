@@ -2,10 +2,12 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Rules\TemplateValidContentRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class TemplateCreateRequest extends FormRequest
 {
@@ -24,10 +26,13 @@ class TemplateCreateRequest extends FormRequest
      */
     public function rules()
     {
+        $channels = FacadesTemplate::getRegisteredChannels();
+        $events = array_keys(FacadesTemplate::getRegisteredEvents());
+
         return [
             'name' => ['required', 'string'],
-            'channel' => ['required', 'string'],
-            'event' => ['required', 'string'],
+            'channel' => ['required', 'string', Rule::in($channels)],
+            'event' => ['required', 'string', Rule::in($events)],
             'default' => ['sometimes', 'bool'],
             'sections' => ['required', 'array', new TemplateValidContentRule()],
             'sections.*.key' => ['string'],
