@@ -20,7 +20,6 @@ use Illuminate\Support\ServiceProvider;
 /**
  * SWAGGER_VERSION
  */
-
 class EscolaLmsTemplatesServiceProvider extends ServiceProvider
 {
     public $singletons = [

@@ -9,6 +9,46 @@ use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @OA\Schema(
+ *      schema="Template",
+ *      @OA\Property(
+ *          property="id",
+ *          description="template id",
+ *          type="integer",
+ *      ),
+ *      @OA\Property(
+ *          property="name",
+ *          description="template name",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="event",
+ *          description="event full classname",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="channel",
+ *          description="channel full classname",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="assignable_type",
+ *          description="classname of Model to which this template is assigned (for example for creating custom template for each Course)",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="assignable_id",
+ *          description="id of Model to which this template is assigned (for example for creating custom template for each Course)",
+ *          type="string"
+ *      ),
+ *      @OA\Property(
+ *          property="default",
+ *          description="this template is default template for given channel and event pair",
+ *          type="bool"
+ *      ),
+ * )
+ */
 class Template extends Model
 {
     use HasFactory;
