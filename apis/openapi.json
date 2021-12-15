@@ -308,28 +308,34 @@
     "components": {
         "schemas": {
             "Template": {
-                "required": [
-                    "name",
-                    "type",
-                    "vars_set",
-                    "content"
-                ],
                 "properties": {
+                    "id": {
+                        "description": "template id",
+                        "type": "integer"
+                    },
                     "name": {
-                        "description": "name ",
+                        "description": "template name",
                         "type": "string"
                     },
-                    "type": {
-                        "description": "type (Certificate, email, etc)",
+                    "event": {
+                        "description": "event full classname",
                         "type": "string"
                     },
-                    "vars_set": {
-                        "description": "avaliable vars (Certificate, email account confirm, etc)",
+                    "channel": {
+                        "description": "channel full classname",
                         "type": "string"
                     },
-                    "content": {
-                        "description": "template content",
+                    "assignable_type": {
+                        "description": "classname of Model to which this template is assigned (for example for creating custom template for each Course)",
                         "type": "string"
+                    },
+                    "assignable_id": {
+                        "description": "id of Model to which this template is assigned (for example for creating custom template for each Course)",
+                        "type": "string"
+                    },
+                    "default": {
+                        "description": "this template is default template for given channel and event pair",
+                        "type": "bool"
                     }
                 },
                 "type": "object"
