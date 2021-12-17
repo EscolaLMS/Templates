@@ -18,6 +18,7 @@ class ModifyTemplatesTable extends Migration
                 } elseif (!Schema::hasColumn($this->table, 'event')) {
                     $table->string('event');
                 }
+
                 if (Schema::hasColumn($this->table, 'vars_set')) {
                     $table->string('vars_set')->default(null)->change();
                     $table->renameColumn('vars_set', 'channel');
@@ -25,10 +26,17 @@ class ModifyTemplatesTable extends Migration
                     $table->string('channel');
                 }
 
-                $table->nullableMorphs('assignable');
-                $table->boolean('default')->default(false);
+                if (!Schema::hasColumn($this->table, 'assignable_id')) {
+                    $table->nullableMorphs('assignable');
+                }
 
-                $table->dropColumn('content');
+                if (!Schema::hasColumn($this->table, 'default')) {
+                    $table->boolean('default')->default(false);
+                }
+
+                if (Schema::hasColumn($this->table, 'content')) {
+                    $table->dropColumn('content');
+                }
             }
         );
     }
@@ -43,16 +51,24 @@ class ModifyTemplatesTable extends Migration
                 } elseif (!Schema::hasColumn($this->table, 'type')) {
                     $table->string('type');
                 }
+
                 if (Schema::hasColumn($this->table, 'channel')) {
                     $table->renameColumn('channel', 'vars_set');
                 } elseif (!Schema::hasColumn($this->table, 'vars_set')) {
                     $table->string('vars_set');
                 }
 
-                $table->longText('content');
+                if (!Schema::hasColumn($this->table, 'content')) {
+                    $table->longText('content');
+                }
 
-                $table->dropColumn('default');
-                $table->dropMorphs('assignable');
+                if (Schema::hasColumn($this->table, 'default')) {
+                    $table->dropColumn('default');
+                }
+
+                if (Schema::hasColumn($this->table, 'assignable_id')) {
+                    $table->dropMorphs('assignable');
+                }
             }
         );
     }
