@@ -13,17 +13,25 @@ class ModifyTemplatesTable extends Migration
         Schema::table(
             $this->table,
             function (Blueprint $table) {
-                if (Schema::hasColumn($this->table, 'type')) {
-                    $table->renameColumn('type', 'event');
-                } elseif (!Schema::hasColumn($this->table, 'event')) {
-                    $table->string('event');
+                if (!Schema::hasColumn($this->table, 'event')) {
+                    if (Schema::hasColumn($this->table, 'type')) {
+                        $table->renameColumn('type', 'event');
+                    } else {
+                        $table->string('event');
+                    }
+                } elseif (Schema::hasColumn($this->table, 'type')) {
+                    $table->dropColumn('type');
                 }
 
-                if (Schema::hasColumn($this->table, 'vars_set')) {
-                    $table->string('vars_set')->default(null)->change();
-                    $table->renameColumn('vars_set', 'channel');
-                } elseif (!Schema::hasColumn($this->table, 'channel')) {
-                    $table->string('channel');
+                if (!Schema::hasColumn($this->table, 'channel')) {
+                    if (Schema::hasColumn($this->table, 'vars_set')) {
+                        $table->string('vars_set')->default(null)->change();
+                        $table->renameColumn('vars_set', 'channel');
+                    } else {
+                        $table->string('channel');
+                    }
+                } elseif (Schema::hasColumn($this->table, 'vars_set')) {
+                    $table->dropColumn('vars_set');
                 }
 
                 if (!Schema::hasColumn($this->table, 'assignable_id')) {
@@ -46,16 +54,24 @@ class ModifyTemplatesTable extends Migration
         Schema::table(
             $this->table,
             function (Blueprint $table) {
-                if (Schema::hasColumn($this->table, 'event')) {
-                    $table->renameColumn('event', 'type');
-                } elseif (!Schema::hasColumn($this->table, 'type')) {
-                    $table->string('type');
+                if (!Schema::hasColumn($this->table, 'type')) {
+                    if (Schema::hasColumn($this->table, 'event')) {
+                        $table->renameColumn('event', 'type');
+                    } else {
+                        $table->string('type');
+                    }
+                } elseif (Schema::hasColumn($this->table, 'event')) {
+                    $table->dropColumn('event');
                 }
 
-                if (Schema::hasColumn($this->table, 'channel')) {
-                    $table->renameColumn('channel', 'vars_set');
-                } elseif (!Schema::hasColumn($this->table, 'vars_set')) {
-                    $table->string('vars_set');
+                if (!Schema::hasColumn($this->table, 'vars_set')) {
+                    if (Schema::hasColumn($this->table, 'channel')) {
+                        $table->renameColumn('channel', 'vars_set');
+                    } else {
+                        $table->string('vars_set');
+                    }
+                } elseif (Schema::hasColumn($this->table, 'channel')) {
+                    $table->dropColumn('channel');
                 }
 
                 if (!Schema::hasColumn($this->table, 'content')) {
