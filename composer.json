@@ -4,6 +4,7 @@
   "type": "package",
   "require": {
     "php": ">=7.4 | >=8.0",
+    "doctrine/dbal": "^3.2",
     "escolalms/core": "^1.2",
     "fakerphp/faker": "^1",
     "laravel/framework": ">=8.0"

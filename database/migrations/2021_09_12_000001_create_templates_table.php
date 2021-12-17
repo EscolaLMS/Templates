@@ -15,10 +15,9 @@ class CreateTemplatesTable extends Migration
             function (Blueprint $table) {
                 $table->id('id');
                 $table->string('name');
-                $table->string('channel');
-                $table->string('event');
-                $table->boolean('default')->default(false);
-                $table->nullableMorphs('assignable');
+                $table->string('type'); // PDF, email, notification
+                $table->string('vars_set')->default('certificates'); // certificates, email_ceortificate, whatever
+                $table->longText('content');
                 $table->timestamps();
             }
         );
