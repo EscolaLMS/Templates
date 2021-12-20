@@ -65,12 +65,14 @@ class FacadeTest extends TestCase
                 "title" => [
                     "type" => TemplateSectionTypeEnum::SECTION_TEXT,
                     "required" => true,
+                    "readonly" => false,
                     "default_content" => "New friend request",
                     "required_variables" => []
                 ],
                 "content" =>  [
                     "type" => TemplateSectionTypeEnum::SECTION_HTML,
                     "required" => true,
+                    "readonly" => false,
                     "default_content" => '<h1>Hello @VarUserEmail!</h1><br/>' . PHP_EOL . '<p>You have new friend request from @VarFriendEmail</p>',
                     "required_variables" => [
                         0 => "@VarUserEmail",
@@ -80,6 +82,7 @@ class FacadeTest extends TestCase
                 "url" => [
                     "type" => TemplateSectionTypeEnum::SECTION_URL,
                     "required" => false,
+                    "readonly" => false,
                     "default_content" => "",
                     "required_variables" => []
                 ]
