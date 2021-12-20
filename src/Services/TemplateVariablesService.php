@@ -4,11 +4,12 @@ namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Templates\Contracts\TemplateChannelContract;
 use EscolaLms\Templates\Contracts\TemplateVariableContract;
+use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Exception;
-use InvalidArgumentException;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class TemplateVariablesService implements TemplateVariablesServiceContract
 {
@@ -108,8 +109,9 @@ class TemplateVariablesService implements TemplateVariablesServiceContract
         }
 
         $variables = $variableClass::requiredVariables();
-        foreach ($channelClass::sections() as $section => $type) {
-            $variables = array_merge($variables, $variableClass::requiredVariablesInSection($section));
+        foreach ($channelClass::sections() as $sectionSchema) {
+            /** @var TemplateSectionSchema $sectionSchema */
+            $variables = array_merge($variables, $variableClass::requiredVariablesInSection($sectionSchema->getKey()));
         }
         return array_unique($variables);
     }

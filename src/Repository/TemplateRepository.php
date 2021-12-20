@@ -3,10 +3,12 @@
 namespace EscolaLms\Templates\Repository;
 
 use EscolaLms\Core\Repositories\BaseRepository;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class TemplateRepository extends BaseRepository implements TemplateRepositoryContract
@@ -23,8 +25,6 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             'channel',
             'event',
             'default',
-            'assignable_type',
-            'assignable_id',
         ];
     }
 
@@ -61,9 +61,10 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             $template = $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
-                'assignable_type' => (new $assigned_class())->getMorphClass(),
-                'assignable_id' => $assigned_value,
-            ])->first();
+            ])->whereHas('assignables', fn (Builder $query) => $query->where([
+                'templatable_type' => (new $assigned_class())->getMorphClass(),
+                'templatable_id' => $assigned_value,
+            ]))->first();
         }
         if (!$template) {
             $template = $this->findTemplateDefault($event, $channel);

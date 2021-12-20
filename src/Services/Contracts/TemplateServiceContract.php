@@ -23,5 +23,7 @@ interface TemplateServiceContract
 
     public function createPreview(Template $template): array;
 
-    public function assignTemplateToModel(Template $template, ?int $assignable_id = null): Template;
+    public function assignTemplateToModel(Template $template, int $assignable_id): Template;
+
+    public function unassignTemplateFromModel(Template $template, int $assignable_id): Template;
 }

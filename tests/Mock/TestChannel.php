@@ -4,8 +4,10 @@ namespace EscolaLms\Templates\Tests\Mock;
 
 use EscolaLms\Templates\Contracts\TemplateChannelContract;
 use EscolaLms\Templates\Core\AbstractTemplateChannelClass;
+use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Events\EventWrapper;
+use Illuminate\Database\Eloquent\Collection;
 
 class TestChannel extends AbstractTemplateChannelClass implements TemplateChannelContract
 {
@@ -27,20 +29,12 @@ class TestChannel extends AbstractTemplateChannelClass implements TemplateChanne
         ];
     }
 
-    public static function sections(): array
+    public static function sections(): Collection
     {
-        return [
-            'title' => TemplateSectionTypeEnum::SECTION_TEXT,
-            'content' => TemplateSectionTypeEnum::SECTION_HTML,
-            'url' => TemplateSectionTypeEnum::SECTION_URL,
-        ];
-    }
-
-    public static function sectionsRequired(): array
-    {
-        return [
-            'title',
-            'content',
-        ];
+        return new Collection([
+            new TemplateSectionSchema('title', TemplateSectionTypeEnum::SECTION_TEXT(), true),
+            new TemplateSectionSchema('content', TemplateSectionTypeEnum::SECTION_HTML(), true),
+            new TemplateSectionSchema('url', TemplateSectionTypeEnum::SECTION_URL()),
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use Exception;
 use InvalidArgumentException;
+use EscolaLms\Templates\Core\TemplateSectionSchema;
 
 class TemplateChannelService implements TemplateChannelServiceContract
 {
@@ -22,13 +23,13 @@ class TemplateChannelService implements TemplateChannelServiceContract
             return;
         }
 
-        foreach ($class::sections() as $key => $type) {
-            if (!is_string($key) || !in_array($type, TemplateSectionTypeEnum::getValues())) {
+        foreach ($class::sections() as $sectionSchema) {
+            if (!$sectionSchema instanceof TemplateSectionSchema) {
                 throw new Exception('Error in Template Channel Class in `sections()` method');
             }
         }
         foreach ($class::sectionsRequired() as $key) {
-            if (!in_array($key, array_keys($class::sections()))) {
+            if (!$class::sections()->where('key', $key)->first()) {
                 throw new Exception('Error in Template Channel Class in `sectionsRequired()` method');
             }
         }
@@ -50,18 +51,19 @@ class TemplateChannelService implements TemplateChannelServiceContract
             if (in_array($section, $class::sectionsRequired()) && empty($content)) {
                 return false;
             }
-            switch ($class::sectionType($section)) {
-                case TemplateSectionTypeEnum::SECTION_HTML:
+            switch ($class::section($section)->getType()) {
+                case TemplateSectionTypeEnum::SECTION_HTML():
+                case TemplateSectionTypeEnum::SECTION_MJML():
                     if ($content === strip_tags($content)) {
                         return false;
                     }
                     break;
-                case TemplateSectionTypeEnum::SECTION_TEXT:
+                case TemplateSectionTypeEnum::SECTION_TEXT():
                     if ($content !== strip_tags($content)) {
                         return false;
                     }
                     break;
-                case TemplateSectionTypeEnum::SECTION_URL:
+                case TemplateSectionTypeEnum::SECTION_URL():
                     if (!filter_var($content, FILTER_VALIDATE_URL)) {
                         return false;
                     }

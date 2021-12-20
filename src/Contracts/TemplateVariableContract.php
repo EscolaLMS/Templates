@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Contracts;
 
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Models\Template;
 
 interface TemplateVariableContract
 {
@@ -18,4 +19,6 @@ interface TemplateVariableContract
     public static function requiredVariablesInSection(string $sectionKey): array;
 
     public static function defaultSectionsContent(): array;
+
+    public static function processTemplateAfterSaving(Template $template): Template;
 }

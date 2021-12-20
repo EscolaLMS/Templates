@@ -100,4 +100,13 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
         return $this->sendResponseForResource(TemplateResource::make($template));
     }
+
+    public function unassign(TemplateAssignRequest $request, $id): Response
+    {
+        $template = $request->getTemplate();
+
+        $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
+
+        return $this->sendResponseForResource(TemplateResource::make($template));
+    }
 }

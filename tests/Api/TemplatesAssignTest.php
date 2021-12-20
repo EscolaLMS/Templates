@@ -52,6 +52,7 @@ class TemplatesAssignTest extends TestCase
 
         $template->refresh();
 
+        $this->assertNotNull($template->assignable);
         $this->assertEquals($user->getKey(), $template->assignable->getKey());
         $this->assertEquals($user->email, $template->assignable->email);
     }

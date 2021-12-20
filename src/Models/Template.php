@@ -33,16 +33,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *          type="string"
  *      ),
  *      @OA\Property(
- *          property="assignable_type",
- *          description="classname of Model to which this template is assigned (for example for creating custom template for each Course)",
- *          type="string"
- *      ),
- *      @OA\Property(
- *          property="assignable_id",
- *          description="id of Model to which this template is assigned (for example for creating custom template for each Course)",
- *          type="string"
- *      ),
- *      @OA\Property(
  *          property="default",
  *          description="this template is default template for given channel and event pair",
  *          type="bool"
@@ -80,6 +70,11 @@ class Template extends Model
     public function assignable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function assignables(): HasMany
+    {
+        return $this->hasMany(Templatable::class);
     }
 
     public function generateContent(array $variables): array
