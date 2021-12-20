@@ -65,13 +65,14 @@ class TemplateEventService implements TemplateEventServiceContract
                     /** @var TemplateSectionSchema $sectionSchema */
                     $sections[$sectionSchema->getKey()] = [
                         'type' => $sectionSchema->getType()->value,
-                        'required' => false,
+                        'required' => $sectionSchema->getRequired(),
+                        'readonly' => $sectionSchema->getReadonly(),
                         'default_content' => '',
                         'required_variables' => $variableClass::requiredVariablesInSection($sectionSchema->getKey()),
                     ];
                     $requiredVariables = array_merge($requiredVariables, $variableClass::requiredVariablesInSection($sectionSchema->getKey()));
                 }
-                foreach ($channel::sectionsRequired() as $section) {
+                foreach ($variableClass::requiredSections() as $section) {
                     $sections[$section]['required'] = true;
                 }
                 foreach ($variableClass::defaultSectionsContent() as $section => $content) {
