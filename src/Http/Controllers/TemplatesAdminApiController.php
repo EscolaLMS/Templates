@@ -87,9 +87,9 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     {
         $template = Template::findOrFail($id);
 
-        $preview = $this->templateService->createPreview($template);
+        $preview = FacadesTemplate::sendPreview($request->user(), $template);
 
-        return $this->sendResponse($preview, "template preview fetched successfully");
+        return $this->sendResponse($preview->toArray(), "template preview fetched successfully");
     }
 
     public function assign(TemplateAssignRequest $request, $id): Response

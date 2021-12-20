@@ -2,8 +2,11 @@
 
 namespace EscolaLms\Templates\Services;
 
+use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Core\TemplatePreview;
 use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
@@ -144,5 +147,13 @@ class TemplateEventService implements TemplateEventServiceContract
                 }
             }
         }
+    }
+
+    public function sendPreview(User $user, Template $template): TemplatePreview
+    {
+        $channelClass = $template->channel;
+        $sections = $template->previewContent($user);
+        $sent = $channelClass::preview($user, $sections);
+        return new TemplatePreview($user, $sections, $sent);
     }
 }

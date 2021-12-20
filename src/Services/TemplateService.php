@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Services;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
@@ -111,10 +112,11 @@ class TemplateService implements TemplateServiceContract
         return $results;
     }
 
-    public function createPreview(Template $template): array
+    public function previewContentUsingMockedVariables(Template $template, ?User $user = null): array
     {
-        $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
-        return $this->generateContentUsingVariables($template, $variableClass::mockedVariables());
+        $channelClass = $template->channel;
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
+        return $this->generateContentUsingVariables($template, $variableClass::mockedVariables($user));
     }
 
     public function assignTemplateToModel(Template $template, int $assignable_id): Template

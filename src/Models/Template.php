@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Models;
 
+use EscolaLms\Core\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use EscolaLms\Templates\Database\Factories\TemplateFactory;
@@ -75,6 +76,13 @@ class Template extends Model
     public function assignables(): HasMany
     {
         return $this->hasMany(Templatable::class);
+    }
+
+    public function previewContent(?User $user = null): array
+    {
+        /** @var TemplateServiceContract $service */
+        $service = app(TemplateServiceContract::class);
+        return $service->previewContentUsingMockedVariables($this, $user);
     }
 
     public function generateContent(array $variables): array

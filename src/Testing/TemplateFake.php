@@ -2,7 +2,10 @@
 
 namespace EscolaLms\Templates\Testing;
 
+use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Core\TemplatePreview;
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
@@ -81,5 +84,12 @@ class TemplateFake extends TemplateEventService implements TemplateEventServiceC
             $events->count() > 0,
             "Event was not handled properly."
         );
+    }
+
+    public function sendPreview(User $user, Template $template): TemplatePreview
+    {
+        $sections = $template->previewContent($user);
+        $sent = true;
+        return new TemplatePreview($user, $sections, $sent);
     }
 }

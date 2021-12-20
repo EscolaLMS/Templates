@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Services\Contracts;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Models\Template;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -21,7 +22,7 @@ interface TemplateServiceContract
 
     public function generateContentUsingVariables(Template $template, array $variables): array;
 
-    public function createPreview(Template $template): array;
+    public function previewContentUsingMockedVariables(Template $template, ?User $user = null): array;
 
     public function assignTemplateToModel(Template $template, int $assignable_id): Template;
 

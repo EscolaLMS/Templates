@@ -92,6 +92,8 @@ class TemplatesPreviewTest extends TestCase
 
     public function testAdminCanPreviewTemplateData()
     {
+        FacadesTemplate::fake();
+
         FacadesTemplate::createDefaultTemplatesForChannel(TestChannel::class);
         $template = Template::whereDefault(true)->whereChannel(TestChannel::class)->whereEvent(TestEventWithGetters::class)->first();
 
@@ -103,8 +105,12 @@ class TemplatesPreviewTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonFragment([
-            'title' => TestVariables::defaultSectionsContent()['title'],
-            'content' => strtr(TestVariables::defaultSectionsContent()['content'], TestVariables::mockedVariables())
+            'sent' => true,
+            'recipient' => $this->user->toArray(),
+            'data' => [
+                'title' => TestVariables::defaultSectionsContent()['title'],
+                'content' => strtr(TestVariables::defaultSectionsContent()['content'], TestVariables::mockedVariables($this->user))
+            ]
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Tests\Mock;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Contracts\TemplateChannelContract;
 use EscolaLms\Templates\Core\AbstractTemplateChannelClass;
 use EscolaLms\Templates\Core\TemplateSectionSchema;
@@ -15,18 +16,24 @@ class TestChannel extends AbstractTemplateChannelClass implements TemplateChanne
 
     public static function send(EventWrapper $event, array $sections): bool
     {
-        self::$handledNotifications[] = self::preview($event, $sections);
-        return true;
-    }
-
-    public static function preview(EventWrapper $event, array $sections): array
-    {
-        return [
+        self::$handledNotifications[] = [
             'event' => $event,
             'title' => $sections['title'],
             'content' => $sections['content'],
             'url' => $sections['url'] ?? null,
         ];
+        return true;
+    }
+
+    public static function preview(User $user, array $sections): bool
+    {
+        self::$handledNotifications[] = [
+            'event' => 'preview',
+            'title' => $sections['title'],
+            'content' => $sections['content'],
+            'url' => $sections['url'] ?? null,
+        ];
+        return true;
     }
 
     public static function sections(): Collection
