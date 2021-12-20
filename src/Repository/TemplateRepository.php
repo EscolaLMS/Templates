@@ -61,10 +61,9 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             $template = $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
-            ])->whereHas('assignables', fn (Builder $query) => $query->where([
-                'templatable_type' => (new $assigned_class())->getMorphClass(),
-                'templatable_id' => $assigned_value,
-            ]))->first();
+                'assignable_id' => $assigned_value,
+                'assignable_class' => $assigned_class,
+            ])->first();
         }
         if (!$template) {
             $template = $this->findTemplateDefault($event, $channel);

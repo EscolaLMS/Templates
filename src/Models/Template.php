@@ -73,11 +73,6 @@ class Template extends Model
         return $this->morphTo();
     }
 
-    public function assignables(): HasMany
-    {
-        return $this->hasMany(Templatable::class);
-    }
-
     public function previewContent(?User $user = null): array
     {
         /** @var TemplateServiceContract $service */
