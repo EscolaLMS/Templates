@@ -3,12 +3,10 @@
 namespace EscolaLms\Templates\Repository;
 
 use EscolaLms\Core\Repositories\BaseRepository;
-use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class TemplateRepository extends BaseRepository implements TemplateRepositoryContract
@@ -25,6 +23,9 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             'channel',
             'event',
             'default',
+            'assignable_id',
+            'assignable_type',
+
         ];
     }
 
@@ -58,17 +59,14 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
     public function findTemplateAssigned(string $event, string $channel, string $assigned_class, ?int $assigned_value): ?Template
     {
         if (is_a($assigned_class, Model::class, true) && !is_null($assigned_value)) {
-            $template = $this->allQuery([
+            return $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
                 'assignable_id' => $assigned_value,
-                'assignable_class' => $assigned_class,
+                'assignable_type' => $assigned_class,
             ])->first();
         }
-        if (!$template) {
-            $template = $this->findTemplateDefault($event, $channel);
-        }
-        return $template;
+        return null;
     }
 
     public function createWithSections(array $attributes, array $sections): Template

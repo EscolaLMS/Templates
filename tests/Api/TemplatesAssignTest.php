@@ -2,10 +2,12 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
+use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Tests\Mock\TestChannel;
 use EscolaLms\Templates\Tests\Mock\TestEventWithGetters;
 use EscolaLms\Templates\Tests\Mock\TestVariables;
@@ -18,10 +20,13 @@ class TemplatesAssignTest extends TestCase
     use DatabaseTransactions;
     use CreatesUsers;
 
+    private TemplateRepositoryContract $repository;
+
     protected function setUp(): void
     {
         parent::setUp();
         FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariablesWithAssignableClass::class);
+        $this->repository = app(TemplateRepositoryContract::class);
     }
 
     private function uri(int $id): string
@@ -51,9 +56,22 @@ class TemplatesAssignTest extends TestCase
         $response->assertOk();
 
         $template->refresh();
-
         $this->assertNotNull($template->assignable);
         $this->assertEquals($user->getKey(), $template->assignable->getKey());
         $this->assertEquals($user->email, $template->assignable->email);
+
+        $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
+        $this->assertEquals($template->getKey(), $templateFound->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->postJson($this->uri($template->id) . '/unassign', [
+            'assignable_id' => $user->getKey()
+        ]);
+        $response->assertOk();
+
+        $template->refresh();
+        $this->assertNull($template->assignable);
+
+        $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
+        $this->assertNull($templateFound);
     }
 }

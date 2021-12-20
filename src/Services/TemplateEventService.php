@@ -125,10 +125,11 @@ class TemplateEventService implements TemplateEventServiceContract
 
     protected function getTemplateForEvent(EventWrapper $event, string $channelClass, string $variableClass): ?Template
     {
+        $template = null;
         if ($variableClass::assignableClass()) {
-            return $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
+            $template = $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
         }
-        return $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
+        return $template ?? $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
     }
 
     public function createDefaultTemplatesForChannel(string $channelClass): void
