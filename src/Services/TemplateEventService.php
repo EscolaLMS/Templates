@@ -139,12 +139,13 @@ class TemplateEventService implements TemplateEventServiceContract
                 $variableClass = $channels[$channelClass];
                 $template = $this->repository->findTemplateDefault($eventClass, $channelClass);
                 if (!$template) {
-                    $this->repository->createWithSections([
+                    $template = $this->repository->createWithSections([
                         'name' => 'Default template for event ' . class_basename($eventClass) . ' on ' . class_basename($channelClass) . ' channel',
                         'event' => $eventClass,
                         'channel' => $channelClass,
                         'default' => true,
                     ], $variableClass::defaultSectionsContent());
+                    $this->processTemplateAfterSaving($template);
                 }
             }
         }
@@ -156,5 +157,12 @@ class TemplateEventService implements TemplateEventServiceContract
         $sections = $template->previewContent($user);
         $sent = $channelClass::preview($user, $sections);
         return new TemplatePreview($user, $sections, $sent);
+    }
+
+    public function processTemplateAfterSaving(Template $template): Template
+    {
+        $channelClass = $template->channel;
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
+        return $variableClass::processTemplateAfterSaving($channelClass::processTemplateAfterSaving($template));
     }
 }

@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Services\Contracts;
 
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Models\Template;
 
 interface TemplateEventServiceContract
 {
@@ -12,4 +13,5 @@ interface TemplateEventServiceContract
     public function getRegisteredEvents(): array;
     public function getRegisteredEventsWithTokens(): array;
     public function getRegisteredChannels(): array;
+    public function processTemplateAfterSaving(Template $template): Template;
 }

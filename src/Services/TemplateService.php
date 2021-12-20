@@ -44,7 +44,7 @@ class TemplateService implements TemplateServiceContract
         } else {
             $template = $this->repository->create($data);
         }
-        return $this->processTemplateAfterSaving($template);
+        return FacadesTemplate::processTemplateAfterSaving($template);
     }
 
     public function deleteById(int $id): bool
@@ -63,7 +63,7 @@ class TemplateService implements TemplateServiceContract
         } else {
             $template =  $this->repository->update($data, $id);
         }
-        return $this->processTemplateAfterSaving($template);
+        return FacadesTemplate::processTemplateAfterSaving($template);
     }
 
     public function isValid(Template $template): bool
@@ -143,12 +143,5 @@ class TemplateService implements TemplateServiceContract
         }
 
         return $template;
-    }
-
-    private function processTemplateAfterSaving(Template $template): Template
-    {
-        $channelClass = $template->channel;
-        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
-        return $variableClass::processTemplateAfterSaving($channelClass::processTemplateAfterSaving($template));
     }
 }
