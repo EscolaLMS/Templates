@@ -2,7 +2,11 @@
 
 namespace EscolaLms\Templates\Services;
 
+use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Core\TemplatePreview;
+use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Events\EventWrapper;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
@@ -12,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 class TemplateEventService implements TemplateEventServiceContract
 {
-    protected array $templates = [];
+    protected array $events = [];
 
     protected TemplateRepositoryContract $repository;
     protected TemplateChannelServiceContract $channelService;
@@ -33,19 +37,19 @@ class TemplateEventService implements TemplateEventServiceContract
         $this->channelService->register($channelClass);
         $this->variableService->registerForChannel($variableClass, $channelClass);
 
-        if (!array_key_exists($eventClass, $this->templates) || !array_key_exists($channelClass, $this->templates[$eventClass])) {
-            $this->templates[$eventClass][$channelClass] = $variableClass;
+        if (!array_key_exists($eventClass, $this->events) || !array_key_exists($channelClass, $this->events[$eventClass])) {
+            $this->events[$eventClass][$channelClass] = $variableClass;
         }
     }
 
     public function getVariableClassName(string $eventClass, string $channelClass): ?string
     {
-        return $this->templates[$eventClass][$channelClass] ?? null;
+        return $this->events[$eventClass][$channelClass] ?? null;
     }
 
     public function getRegisteredEvents(): array
     {
-        return $this->templates;
+        return $this->events;
     }
 
     public function getRegisteredChannels(): array
@@ -56,20 +60,22 @@ class TemplateEventService implements TemplateEventServiceContract
     public function getRegisteredEventsWithTokens(): array
     {
         $result = [];
-        foreach ($this->templates as $event => $channels) {
+        foreach ($this->events as $event => $channels) {
             foreach ($channels as $channel => $variableClass) {
                 $sections = [];
                 $requiredVariables = [];
-                foreach ($channel::sections() as $section => $type) {
-                    $sections[$section] = [
-                        'type' => $type,
-                        'required' => false,
+                foreach ($channel::sections() as $sectionSchema) {
+                    /** @var TemplateSectionSchema $sectionSchema */
+                    $sections[$sectionSchema->getKey()] = [
+                        'type' => $sectionSchema->getType()->value,
+                        'required' => $sectionSchema->getRequired(),
+                        'readonly' => $sectionSchema->getReadonly(),
                         'default_content' => '',
-                        'required_variables' => $variableClass::requiredVariablesInSection($section),
+                        'required_variables' => $variableClass::requiredVariablesInSection($sectionSchema->getKey()),
                     ];
-                    $requiredVariables = array_merge($requiredVariables, $variableClass::requiredVariablesInSection($section));
+                    $requiredVariables = array_merge($requiredVariables, $variableClass::requiredVariablesInSection($sectionSchema->getKey()));
                 }
-                foreach ($channel::sectionsRequired() as $section) {
+                foreach ($variableClass::requiredSections() as $section) {
                     $sections[$section]['required'] = true;
                 }
                 foreach ($variableClass::defaultSectionsContent() as $section => $content) {
@@ -79,7 +85,7 @@ class TemplateEventService implements TemplateEventServiceContract
                     'class' => $variableClass,
                     'assignableClass' => $variableClass::assignableClass(),
                     'variables' => $variableClass::variables(),
-                    'required_variables' => array_merge($variableClass::requiredVariables(), array_unique($requiredVariables)),
+                    'required_variables' =>  array_unique(array_merge($variableClass::requiredVariables(), $requiredVariables)),
                     'sections' => $sections,
                 ];
             }
@@ -89,12 +95,12 @@ class TemplateEventService implements TemplateEventServiceContract
 
     public function handleEvent(EventWrapper $event): void
     {
-        if (!array_key_exists($event->eventClass(), $this->templates)) {
+        if (!array_key_exists($event->eventClass(), $this->events)) {
             return;
         }
 
-        foreach ($this->templates[$event->eventClass()] as $channelClass => $variableClass) {
-            $template = $this->getCorrectTemplate($event, $channelClass, $variableClass);
+        foreach ($this->events[$event->eventClass()] as $channelClass => $variableClass) {
+            $template = $this->getTemplateForEvent($event, $channelClass, $variableClass);
 
             if (!$template) {
                 Log::error(__('Template not found when handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass]));
@@ -117,17 +123,18 @@ class TemplateEventService implements TemplateEventServiceContract
         }
     }
 
-    protected function getCorrectTemplate(EventWrapper $event, string $channelClass, string $variableClass): ?Template
+    protected function getTemplateForEvent(EventWrapper $event, string $channelClass, string $variableClass): ?Template
     {
+        $template = null;
         if ($variableClass::assignableClass()) {
-            return $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
+            $template = $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
         }
-        return $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
+        return $template ?? $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
     }
 
     public function createDefaultTemplatesForChannel(string $channelClass): void
     {
-        foreach ($this->templates as $eventClass => $channels) {
+        foreach ($this->events as $eventClass => $channels) {
             if (array_key_exists($channelClass, $channels)) {
                 $variableClass = $channels[$channelClass];
                 $template = $this->repository->findTemplateDefault($eventClass, $channelClass);
@@ -141,5 +148,13 @@ class TemplateEventService implements TemplateEventServiceContract
                 }
             }
         }
+    }
+
+    public function sendPreview(User $user, Template $template): TemplatePreview
+    {
+        $channelClass = $template->channel;
+        $sections = $template->previewContent($user);
+        $sent = $channelClass::preview($user, $sections);
+        return new TemplatePreview($user, $sections, $sent);
     }
 }

@@ -87,9 +87,9 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     {
         $template = Template::findOrFail($id);
 
-        $preview = $this->templateService->createPreview($template);
+        $preview = FacadesTemplate::sendPreview($request->user(), $template);
 
-        return $this->sendResponse($preview, "template preview fetched successfully");
+        return $this->sendResponse($preview->toArray(), "template preview fetched successfully");
     }
 
     public function assign(TemplateAssignRequest $request, $id): Response
@@ -97,6 +97,15 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         $template = $request->getTemplate();
 
         $this->templateService->assignTemplateToModel($template, $request->input('assignable_id'));
+
+        return $this->sendResponseForResource(TemplateResource::make($template));
+    }
+
+    public function unassign(TemplateAssignRequest $request, $id): Response
+    {
+        $template = $request->getTemplate();
+
+        $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
 
         return $this->sendResponseForResource(TemplateResource::make($template));
     }

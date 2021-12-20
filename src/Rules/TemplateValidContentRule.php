@@ -15,6 +15,7 @@ class TemplateValidContentRule implements Rule
     private TemplateVariablesServiceContract $templateVariableService;
 
     private array $missingSections = [];
+    private array $readonlySections = [];
     private array $missingVariables = [];
 
     public function __construct(?Template $template = null)
@@ -52,13 +53,19 @@ class TemplateValidContentRule implements Rule
             }
         }
 
+        foreach ($channelClass::sectionsReadonly() as $section) {
+            if (in_array($section, $allSections)) {
+                $this->readonlySections[] = $section;
+            }
+        }
+
         foreach ($this->templateVariableService->requiredSectionsForChannel($templateVariableClass, $channelClass) as $section) {
             if (!in_array($section, $allSections)) {
                 $this->missingSections[] = $section;
             }
         }
 
-        return empty($this->missingVariables) && empty($this->missingSections) && $this->templateVariableService->contentIsValidForChannel($templateVariableClass, $channelClass, $allContent);
+        return empty($this->missingVariables) && empty($this->missingSections) && empty($this->readonlySections) && $this->templateVariableService->contentIsValidForChannel($templateVariableClass, $channelClass, $allContent);
     }
 
     /**
@@ -74,6 +81,9 @@ class TemplateValidContentRule implements Rule
         }
         foreach ($this->missingSections as $section) {
             $msg .= __('Required section: ' . $section) . PHP_EOL;
+        }
+        foreach ($this->readonlySections as $section) {
+            $msg .= __('Readonly section:' . $section) . PHP_EOL;
         }
         return $msg;
     }

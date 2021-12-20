@@ -20,8 +20,8 @@ class TemplateResource extends JsonResource
             'event' => $this->event,
             'channel' => $this->channel,
             'default' => $this->default,
-            'assignable' => $this->assignable,
             'sections' => $this->sections,
+            'assignables' => $this->assignables,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

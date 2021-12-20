@@ -2,13 +2,13 @@
 
 namespace EscolaLms\Templates\Services;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use InvalidArgumentException;
 
 class TemplateService implements TemplateServiceContract
 {
@@ -40,9 +40,11 @@ class TemplateService implements TemplateServiceContract
                 $sections[$section['key']] = $section['content'];
             }
             unset($data['sections']);
-            return $this->repository->createWithSections($data, $sections);
+            $template = $this->repository->createWithSections($data, $sections);
+        } else {
+            $template = $this->repository->create($data);
         }
-        return  $this->repository->create($data);
+        return $this->processTemplateAfterSaving($template);
     }
 
     public function deleteById(int $id): bool
@@ -57,9 +59,11 @@ class TemplateService implements TemplateServiceContract
                 $sections[$section['key']] = $section['content'];
             }
             unset($data['sections']);
-            return $this->repository->updateWithSections($data, $sections, $id);
+            $template = $this->repository->updateWithSections($data, $sections, $id);
+        } else {
+            $template =  $this->repository->update($data, $id);
         }
-        return $this->repository->update($data, $id);
+        return $this->processTemplateAfterSaving($template);
     }
 
     public function isValid(Template $template): bool
@@ -108,25 +112,43 @@ class TemplateService implements TemplateServiceContract
         return $results;
     }
 
-    public function createPreview(Template $template): array
+    public function previewContentUsingMockedVariables(Template $template, ?User $user = null): array
     {
-        $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
-        return $this->generateContentUsingVariables($template, $variableClass::mockedVariables());
+        $channelClass = $template->channel;
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
+        return $this->generateContentUsingVariables($template, $variableClass::mockedVariables($user));
     }
 
-    public function assignTemplateToModel(Template $template, ?int $assignable_id = null): Template
+    public function assignTemplateToModel(Template $template, int $assignable_id): Template
     {
-        if (is_null($assignable_id)) {
-            $template->assignable()->disassociate();
-        } else {
-            $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
-            $assignableClass = $variableClass::assignableClass();
-            if (class_exists($assignableClass)) {
-                $assignable = $assignableClass::findOrFail($assignable_id);
-                $template->assignable()->associate($assignable);
-            }
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
+        $assignableClass = $variableClass::assignableClass();
+        if (class_exists($assignableClass)) {
+            $assignable = $assignableClass::findOrFail($assignable_id);
+            $template->assignable()->associate($assignable);
+            $template->save();
         }
-        $template->save();
-        return $template->refresh();
+
+        return $template;
+    }
+
+    public function unassignTemplateFromModel(Template $template, int $assignable_id): Template
+    {
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
+        $assignableClass = $variableClass::assignableClass();
+        if (class_exists($assignableClass)) {
+            $assignable = $assignableClass::findOrFail($assignable_id);
+            $template->assignable()->dissociate($assignable);
+            $template->save();
+        }
+
+        return $template;
+    }
+
+    private function processTemplateAfterSaving(Template $template): Template
+    {
+        $channelClass = $template->channel;
+        $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
+        return $variableClass::processTemplateAfterSaving($channelClass::processTemplateAfterSaving($template));
     }
 }

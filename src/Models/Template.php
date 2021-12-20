@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Models;
 
+use EscolaLms\Core\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use EscolaLms\Templates\Database\Factories\TemplateFactory;
@@ -30,16 +31,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *      @OA\Property(
  *          property="channel",
  *          description="channel full classname",
- *          type="string"
- *      ),
- *      @OA\Property(
- *          property="assignable_type",
- *          description="classname of Model to which this template is assigned (for example for creating custom template for each Course)",
- *          type="string"
- *      ),
- *      @OA\Property(
- *          property="assignable_id",
- *          description="id of Model to which this template is assigned (for example for creating custom template for each Course)",
  *          type="string"
  *      ),
  *      @OA\Property(
@@ -80,6 +71,13 @@ class Template extends Model
     public function assignable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function previewContent(?User $user = null): array
+    {
+        /** @var TemplateServiceContract $service */
+        $service = app(TemplateServiceContract::class);
+        return $service->previewContentUsingMockedVariables($this, $user);
     }
 
     public function generateContent(array $variables): array

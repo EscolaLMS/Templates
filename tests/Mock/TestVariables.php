@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Tests\Mock;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Contracts\TemplateVariableContract;
 use EscolaLms\Templates\Core\AbstractTemplateVariableClass;
 use EscolaLms\Templates\Events\EventWrapper;
@@ -21,10 +22,10 @@ class TestVariables extends AbstractTemplateVariableClass implements TemplateVar
         ];
     }
 
-    public static function mockedVariables(): array
+    public static function mockedVariables(?User $user = null): array
     {
         return [
-            self::VAR_USER_EMAIL => 'user.email@test.com',
+            self::VAR_USER_EMAIL => $user ? $user->email : 'user.email@test.com',
             self::VAR_FRIEND_EMAIL => 'friend.email@test.com',
         ];
     }

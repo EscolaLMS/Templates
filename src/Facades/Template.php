@@ -2,20 +2,22 @@
 
 namespace EscolaLms\Templates\Facades;
 
-use EscolaLms\Templates\Testing\TemplateFake;
-use Illuminate\Support\Facades\Facade;
+use EscolaLms\Templates\Core\TemplatePreview;
 use EscolaLms\Templates\Events\EventWrapper;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
+use EscolaLms\Templates\Testing\TemplateFake;
+use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static void    register(string $eventClass, string $channelClass, string $variableClass)
- * @method static void    handleEvent(EventWrapper $event)
- * @method static ?string getVariableClassName(string $eventClass, string $channelClass)
- * @method static array   getRegisteredEvents()
- * @method static array   getRegisteredChannels()
- * @method static array   getRegisteredEventsWithTokens()
- * @method static bool    assertEventHandled(string $eventClass, string $channelClass, ?string $variableClass = null) 
- * @method static void    createDefaultTemplatesForChannel(string $channelClass)
+ * @method static            void register(string $eventClass, string $channelClass, string $variableClass)
+ * @method static            void handleEvent(EventWrapper $event)
+ * @method static         ?string getVariableClassName(string $eventClass, string $channelClass)
+ * @method static           array getRegisteredEvents()
+ * @method static           array getRegisteredChannels()
+ * @method static           array getRegisteredEventsWithTokens()
+ * @method static            bool assertEventHandled(string $eventClass, string $channelClass, ?string $variableClass = null) 
+ * @method static            void createDefaultTemplatesForChannel(string $channelClass)
+ * @method static TemplatePreview sendPreview(\EscolaLms\Core\Models\User $user, \EscolaLms\Templates\Models\Template $template)
  * 
  * @see \EscolaLms\Templates\Services\TemplateEventService
  */

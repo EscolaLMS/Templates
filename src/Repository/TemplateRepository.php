@@ -23,8 +23,9 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             'channel',
             'event',
             'default',
-            'assignable_type',
             'assignable_id',
+            'assignable_type',
+
         ];
     }
 
@@ -58,17 +59,14 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
     public function findTemplateAssigned(string $event, string $channel, string $assigned_class, ?int $assigned_value): ?Template
     {
         if (is_a($assigned_class, Model::class, true) && !is_null($assigned_value)) {
-            $template = $this->allQuery([
+            return $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
-                'assignable_type' => (new $assigned_class())->getMorphClass(),
                 'assignable_id' => $assigned_value,
+                'assignable_type' => $assigned_class,
             ])->first();
         }
-        if (!$template) {
-            $template = $this->findTemplateDefault($event, $channel);
-        }
-        return $template;
+        return null;
     }
 
     public function createWithSections(array $attributes, array $sections): Template

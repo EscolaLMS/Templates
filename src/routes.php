@@ -13,4 +13,5 @@ Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], 
     Route::delete('/{id}', [TemplatesAdminApiController::class, 'delete']);
     Route::patch('/{id}', [TemplatesAdminApiController::class, 'update']);
     Route::post('/{id}/assign', [TemplatesAdminApiController::class, 'assign']);
+    Route::post('/{id}/unassign', [TemplatesAdminApiController::class, 'unassign']);
 });
