@@ -325,14 +325,6 @@
                         "description": "channel full classname",
                         "type": "string"
                     },
-                    "assignable_type": {
-                        "description": "classname of Model to which this template is assigned (for example for creating custom template for each Course)",
-                        "type": "string"
-                    },
-                    "assignable_id": {
-                        "description": "id of Model to which this template is assigned (for example for creating custom template for each Course)",
-                        "type": "string"
-                    },
                     "default": {
                         "description": "this template is default template for given channel and event pair",
                         "type": "bool"
