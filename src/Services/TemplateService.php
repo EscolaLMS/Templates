@@ -5,6 +5,7 @@ namespace EscolaLms\Templates\Services;
 use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
+use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
@@ -107,7 +108,8 @@ class TemplateService implements TemplateServiceContract
     {
         $results = [];
         foreach ($template->sections as $section) {
-            $results[$section['key']] = strtr($section->content, $variables);
+            /** @var TemplateSection $section */
+            $results[$section->key] = strtr($section->content, $variables);
         }
         return $results;
     }
