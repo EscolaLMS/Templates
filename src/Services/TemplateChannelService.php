@@ -68,6 +68,10 @@ class TemplateChannelService implements TemplateChannelServiceContract
                         return false;
                     }
                     break;
+
+                case TemplateSectionTypeEnum::SECTION_FABRIC();
+                    // TODO is there any validation for fabric js
+                    return true;
                 default:
                     break;
             }
