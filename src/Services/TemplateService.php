@@ -106,7 +106,10 @@ class TemplateService implements TemplateServiceContract
 
     public function generateContentUsingVariables(Template $template, array $variables): array
     {
-        $results = [];
+        $results = [
+            'template_id' => $template->id;
+        ];
+        
         foreach ($template->sections as $section) {
             /** @var TemplateSection $section */
             $results[$section->key] = strtr($section->content, $variables);
