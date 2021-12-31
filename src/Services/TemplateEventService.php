@@ -118,9 +118,7 @@ class TemplateEventService implements TemplateEventServiceContract
                 Log::error(__('Template sections evaluate to incorrect types', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
                 continue;
             }
-            
-            $sections['template_id'] = $template->id;
-
+                        
             $channelClass::send($event, $sections);
         }
     }
