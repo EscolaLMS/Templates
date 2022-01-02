@@ -16,6 +16,11 @@ class TemplatePolicy
         return !is_null($user) && $user->can(TemplatesPermissionsEnum::TEMPLATES_LIST);
     }
 
+    public function read(?User $user): bool
+    {
+        return !is_null($user) && $user->can(TemplatesPermissionsEnum::TEMPLATES_READ);
+    }
+
     public function create(?User $user): bool
     {
         return !is_null($user) && $user->can(TemplatesPermissionsEnum::TEMPLATES_CREATE);

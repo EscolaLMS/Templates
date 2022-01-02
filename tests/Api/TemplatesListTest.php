@@ -12,7 +12,7 @@ class TemplatesListTest extends TestCase
 
     private string $uri = '/api/templates';
 
-    public function testAdminCanListEmpty()
+    public function testAdminCanListEmpty(): void
     {
         $this->authenticateAsAdmin();
 
@@ -27,7 +27,7 @@ class TemplatesListTest extends TestCase
         $response->assertJsonCount(0, 'data');
     }
 
-    public function testAdminCanList()
+    public function testAdminCanList(): void
     {
         $this->authenticateAsAdmin();
 
@@ -44,5 +44,12 @@ class TemplatesListTest extends TestCase
         $response->assertJsonFragment(
             $templatesArr[0],
         );
+    }
+
+    public function testGuestCannotList(): void
+    {
+        $response = $this->getJson('/api/admin/templates');
+
+        $response->assertUnauthorized();
     }
 }

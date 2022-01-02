@@ -21,7 +21,7 @@ class TemplatesPreviewTest extends TestCase
         FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
     }
 
-    public function testAdminCanListRegisteredEvents()
+    public function testAdminCanListRegisteredEvents(): void
     {
         $this->authenticateAsAdmin();
         $response = $this->actingAs($this->user, 'api')->getJson(
@@ -38,7 +38,7 @@ class TemplatesPreviewTest extends TestCase
         $this->assertEquals(TestVariables::class, $variables[TestEventWithGetters::class][TestChannel::class]);
     }
 
-    public function testAdminCanListVariables()
+    public function testAdminCanListVariables(): void
     {
         $this->authenticateAsAdmin();
         $response = $this->actingAs($this->user, 'api')->getJson(
@@ -90,7 +90,7 @@ class TemplatesPreviewTest extends TestCase
         ], $variables[TestEventWithGetters::class][TestChannel::class]);
     }
 
-    public function testAdminCanPreviewTemplateData()
+    public function testAdminCanPreviewTemplateData(): void
     {
         FacadesTemplate::fake();
 

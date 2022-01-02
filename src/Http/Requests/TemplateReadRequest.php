@@ -11,9 +11,9 @@ class TemplateReadRequest extends FormRequest
     /**
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return Gate::allows('list', Template::class);
+        return Gate::allows('read', Template::class);
     }
 
     /**
@@ -21,7 +21,7 @@ class TemplateReadRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [];
     }

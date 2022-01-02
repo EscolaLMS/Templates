@@ -26,7 +26,7 @@ class TemplatesUpdateTest extends TestCase
         return sprintf('/api/admin/templates/%s', $id);
     }
 
-    public function testAdminCanUpdateExistingTemplate()
+    public function testAdminCanUpdateExistingTemplate(): void
     {
         $this->authenticateAsAdmin();
 
@@ -53,7 +53,7 @@ class TemplatesUpdateTest extends TestCase
         $this->assertTrue($template->is_valid);
     }
 
-    public function testAdminCanUpdateExistingTemplateWithMissingName()
+    public function testAdminCanUpdateExistingTemplateWithMissingName(): void
     {
         $this->authenticateAsAdmin();
 
@@ -82,7 +82,7 @@ class TemplatesUpdateTest extends TestCase
         $this->assertTrue($template->is_valid);
     }
 
-    public function testAdminCannotUpdateMissingTemplate()
+    public function testAdminCannotUpdateMissingTemplate(): void
     {
         $this->authenticateAsAdmin();
 
@@ -100,7 +100,7 @@ class TemplatesUpdateTest extends TestCase
         $this->assertEquals(0, $template->newQuery()->where('id', $template->id)->count());
     }
 
-    public function testGuestCannotUpdateExistingTemplate()
+    public function testGuestCannotUpdateExistingTemplate(): void
     {
         $template = Template::factory()->createOne();
         $templateNew = Template::factory()->makeOne();
