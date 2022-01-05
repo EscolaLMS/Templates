@@ -7,6 +7,8 @@ use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class TemplateRepository extends BaseRepository implements TemplateRepositoryContract
@@ -23,9 +25,6 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             'channel',
             'event',
             'default',
-            'assignable_id',
-            'assignable_type',
-
         ];
     }
 
@@ -62,9 +61,7 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             return $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
-                'assignable_id' => $assigned_value,
-                'assignable_type' => $assigned_class,
-            ])->first();
+            ])->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assigned_value)->where('templatable_type', $assigned_class))->first();
         }
         return null;
     }
@@ -90,5 +87,13 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
             $section = TemplateSection::updateOrCreate(['template_id' => $template->getKey(), 'key' => $section], ['content' => $content]);
         }
         return $template;
+    }
+
+    public function findAllTemplatesAssigned(string $assignable_class, int $assignable_id): Collection
+    {
+        if (is_a($assignable_class, Model::class, true)) {
+            return $this->allQuery()->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assignable_id)->where('templatable_type', $assignable_class))->get();
+        }
+        return Collection::empty();
     }
 }

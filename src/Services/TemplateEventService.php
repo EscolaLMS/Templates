@@ -83,7 +83,7 @@ class TemplateEventService implements TemplateEventServiceContract
                 }
                 $result[$event][$channel] = [
                     'class' => $variableClass,
-                    'assignableClass' => $variableClass::assignableClass(),
+                    'assignable_class' => $variableClass::assignableClass(),
                     'variables' => $variableClass::variables(),
                     'required_variables' =>  array_unique(array_merge($variableClass::requiredVariables(), $requiredVariables)),
                     'sections' => $sections,

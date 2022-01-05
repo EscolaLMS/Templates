@@ -5,6 +5,7 @@ namespace EscolaLms\Templates\Http\Controllers;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Http\Controllers\Contracts\TemplatesAdminApiContract;
+use EscolaLms\Templates\Http\Requests\TemplateAssignedRequest;
 use EscolaLms\Templates\Http\Requests\TemplateAssignRequest;
 use EscolaLms\Templates\Http\Requests\TemplateCreateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
@@ -108,5 +109,12 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
 
         return $this->sendResponseForResource(TemplateResource::make($template));
+    }
+
+    public function assigned(TemplateAssignedRequest $request): Response
+    {
+        $templates = $this->templateService->findTemplatesAssignedToModel($request->input('assignable_class'), $request->input('assignable_id'));
+
+        return $this->sendResponseForResource(TemplateResource::collection($templates));
     }
 }
