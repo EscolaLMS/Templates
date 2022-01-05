@@ -53,11 +53,17 @@ class TemplateChannelService implements TemplateChannelServiceContract
             return false;
         }
         foreach ($sections as $section => $content) {
+            /** @var ?TemplateSectionSchema $sectionSchema */
+            $sectionSchema = $class::section($section);
+            if (is_null($sectionSchema)) {
+                // skip sections not used by given Channel
+                continue;
+            }
             if (in_array($section, $class::sectionsRequired()) && empty($content)) {
                 $this->sectionValidationErrors[] = __('Empty content for required section :section', ['section' => $section]);
                 continue;
             }
-            switch ($class::section($section)->getType()) {
+            switch ($sectionSchema->getType()) {
                 case TemplateSectionTypeEnum::SECTION_HTML():
                 case TemplateSectionTypeEnum::SECTION_MJML():
                     if ($content === strip_tags($content)) {
