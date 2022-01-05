@@ -103,11 +103,11 @@ class TemplateEventService implements TemplateEventServiceContract
             $template = $this->getTemplateForEvent($event, $channelClass, $variableClass);
 
             if (!$template) {
-                Log::error(__('Template not found when handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass]));
+                Log::error(__('Template not found when handling registered Event'), ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass]);
                 continue;
             }
             if (!$template->is_valid) {
-                Log::error(__('Template is invalid for handling registered Event', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
+                Log::error(__('Template is invalid for handling registered Event'), ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]);
                 continue;
             }
 
@@ -115,10 +115,10 @@ class TemplateEventService implements TemplateEventServiceContract
             $sections = $template->generateContent($variables);
 
             if (!$this->channelService->validateTemplateSections($channelClass, $sections)) {
-                Log::error(__('Template sections evaluate to incorrect types', ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey()]));
+                Log::error(__('Template sections evaluate to incorrect types'), ['event' => $event->eventClass(), 'channel' => $channelClass, 'variables' => $variableClass, 'template_name' => $template->name, 'template_id' => $template->getKey(), 'errors' => $this->channelService->lastValidationErrors()]);
                 continue;
             }
-            
+
             $sections['template_id'] = $template->id;
 
             $channelClass::send($event, $sections);

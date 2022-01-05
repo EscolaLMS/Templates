@@ -50,6 +50,9 @@ class TemplatesAssignTest extends TestCase
 
         $this->assertNull($template->assignable);
 
+        $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
+        $this->assertNull($templateFound);
+
         $response = $this->actingAs($this->user, 'api')->postJson($this->uri($template->id) . '/assign', [
             'assignable_id' => $user->getKey()
         ]);
