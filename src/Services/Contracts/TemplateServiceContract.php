@@ -5,6 +5,7 @@ namespace EscolaLms\Templates\Services\Contracts;
 use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Models\Template;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface TemplateServiceContract
 {
@@ -27,4 +28,6 @@ interface TemplateServiceContract
     public function assignTemplateToModel(Template $template, int $assignable_id): Template;
 
     public function unassignTemplateFromModel(Template $template, int $assignable_id): Template;
+
+    public function findTemplatesAssignedToModel(string $assignable_class, int $assignable_id): Collection;
 }

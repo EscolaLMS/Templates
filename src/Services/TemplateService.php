@@ -4,12 +4,14 @@ namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
+use EscolaLms\Templates\Models\Templatable;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class TemplateService implements TemplateServiceContract
 {
@@ -125,25 +127,28 @@ class TemplateService implements TemplateServiceContract
     {
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
         $assignableClass = $variableClass::assignableClass();
+
         if (class_exists($assignableClass)) {
             $assignable = $assignableClass::findOrFail($assignable_id);
-            $template->assignable()->associate($assignable);
-            $template->save();
+
+            Templatable::updateOrCreate(['event' => $template->event, 'channel' => $template->channel, 'templatable_type' => $assignableClass, 'templatable_id' => $assignable->getKey()], ['template_id' => $template->getKey()]);
         }
 
-        return $template;
+        return $template->refresh();
     }
 
     public function unassignTemplateFromModel(Template $template, int $assignable_id): Template
     {
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
         $assignableClass = $variableClass::assignableClass();
-        if (class_exists($assignableClass)) {
-            $assignable = $assignableClass::findOrFail($assignable_id);
-            $template->assignable()->dissociate($assignable);
-            $template->save();
-        }
 
-        return $template;
+        Templatable::where('templatable_type', $assignableClass)->where('templatable_id', $assignable_id)->where('template_id', $template->getKey())->delete();
+
+        return $template->refresh();
+    }
+
+    public function findTemplatesAssignedToModel(string $assignable_class, int $assignable_id): Collection
+    {
+        return $this->repository->findAllTemplatesAssigned($assignable_class, $assignable_id);
     }
 }

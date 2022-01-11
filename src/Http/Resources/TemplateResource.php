@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Http\Resources;
 
+use EscolaLms\Templates\Models\Templatable;
 use EscolaLms\Templates\Models\Template;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,7 +22,7 @@ class TemplateResource extends JsonResource
             'channel' => $this->channel,
             'default' => $this->default,
             'sections' => $this->sections,
-            'assignables' => $this->assignables,
+            'assignables' => $this->templatables->map(fn (Templatable $templatable) => ['class' => $templatable->templatable_type, 'id' => $templatable->templatable_id]),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
