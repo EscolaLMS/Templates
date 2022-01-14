@@ -11,6 +11,26 @@
                     "Templates"
                 ],
                 "summary": "Lists available templates",
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "description": "Channel class for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "event",
+                        "in": "query",
+                        "description": "Event class for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "list of available templates",
