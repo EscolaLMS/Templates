@@ -31,7 +31,8 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
     public function list(TemplateListingRequest $request): JsonResponse
     {
-        $templates = $this->templateService->search();
+        $search = $request->only(['event', 'channel']);
+        $templates = $this->templateService->search($search);
         return $this->sendResponseForResource(TemplateResource::collection($templates), "templates list retrieved successfully");
     }
 

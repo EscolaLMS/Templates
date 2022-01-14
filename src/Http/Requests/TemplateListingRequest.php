@@ -23,6 +23,9 @@ class TemplateListingRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'event' => ['sometimes', 'string'],
+            'channel' => ['sometimes', 'string'],
+        ];
     }
 }
