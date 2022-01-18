@@ -27,7 +27,7 @@ class TemplatesCreateTest extends TestCase
         return sprintf('/api/admin/templates%s', $suffix);
     }
 
-    public function testAdminCanCreateTemplate()
+    public function testAdminCanCreateTemplate(): void
     {
         $this->authenticateAsAdmin();
         $template = Template::factory()->makeOne();
@@ -55,7 +55,7 @@ class TemplatesCreateTest extends TestCase
         $response2->assertOk();
     }
 
-    public function testAdminCannotCreateTemplateWithoutTitle()
+    public function testAdminCannotCreateTemplateWithoutTitle(): void
     {
         $this->authenticateAsAdmin();
 
@@ -85,7 +85,7 @@ class TemplatesCreateTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function testAdminCannotCreateTemplateWithMissingSection()
+    public function testAdminCannotCreateTemplateWithMissingSection(): void
     {
         $this->authenticateAsAdmin();
         $template = Template::factory()->makeOne();
@@ -109,7 +109,7 @@ class TemplatesCreateTest extends TestCase
         $response->assertJsonValidationErrors(['sections' => 'Required section: content']);
     }
 
-    public function testAdminCannotCreateTemplateWithMissingVariablesInSection()
+    public function testAdminCannotCreateTemplateWithMissingVariablesInSection(): void
     {
         $this->authenticateAsAdmin();
         $template = Template::factory()->makeOne();
@@ -134,7 +134,7 @@ class TemplatesCreateTest extends TestCase
         $response->assertJsonValidationErrors(['sections' => 'Required variables in section: content [@VarUserEmail, @VarFriendEmail]']);
     }
 
-    public function testGuestCannotCreateTemplate()
+    public function testGuestCannotCreateTemplate(): void
     {
         $template = Template::factory()->makeOne();
         $response = $this->postJson(

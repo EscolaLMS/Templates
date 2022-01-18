@@ -23,6 +23,7 @@ class PermissionTableSeeder extends Seeder
             TemplatesPermissionsEnum::TEMPLATES_DELETE,
             TemplatesPermissionsEnum::TEMPLATES_UPDATE,
             TemplatesPermissionsEnum::TEMPLATES_LIST,
+            TemplatesPermissionsEnum::TEMPLATES_READ,
         ];
 
         foreach ($permissions as $permission) {

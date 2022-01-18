@@ -34,7 +34,7 @@ class TemplatesAssignTest extends TestCase
         return sprintf('/api/admin/templates/%s', $id);
     }
 
-    public function testAdminCanAssignTemplate()
+    public function testAdminCanAssignTemplate(): void
     {
         $this->authenticateAsAdmin();
 

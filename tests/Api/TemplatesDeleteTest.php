@@ -15,7 +15,7 @@ class TemplatesDeleteTest extends TestCase
         return sprintf('/api/admin/templates/%s', $id);
     }
 
-    public function testAdminCanDeleteExistingTemplate()
+    public function testAdminCanDeleteExistingTemplate(): void
     {
         $this->authenticateAsAdmin();
 
@@ -25,7 +25,7 @@ class TemplatesDeleteTest extends TestCase
         $this->assertEquals(0, Template::factory()->make()->newQuery()->where('id', $template->id)->count());
     }
 
-    public function testAdminCannotDeleteMissingTemplate()
+    public function testAdminCannotDeleteMissingTemplate(): void
     {
         $this->authenticateAsAdmin();
 
@@ -37,7 +37,7 @@ class TemplatesDeleteTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function testGuestCannotDeleteExistingTemplate()
+    public function testGuestCannotDeleteExistingTemplate(): void
     {
         $template = Template::factory()->createOne();
         $response = $this->json('delete', $this->uri($template->id));

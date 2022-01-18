@@ -15,14 +15,14 @@ class TemplatesReadTest extends TestCase
         return sprintf('/api/templates/%s', $suffix);
     }
 
-    public function testCannotFindMissing()
+    public function testCannotFindMissing(): void
     {
         $this->authenticateAsAdmin();
         $response = $this->actingAs($this->user, 'api')->getJson($this->uri('non-existing-template'));
         $response->assertNotFound();
     }
 
-    public function testAdminCanReadExistingById()
+    public function testAdminCanReadExistingById(): void
     {
         $this->authenticateAsAdmin();
 
@@ -31,5 +31,14 @@ class TemplatesReadTest extends TestCase
         $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates/' . $template->getKey());
         $response->assertOk();
         $response->assertJsonFragment(collect($template->getAttributes())->except('id', 'created_at', 'updated_at')->toArray());
+    }
+
+    public function testGuestCannotReadExistingById(): void
+    {
+        $template = Template::factory()->createOne();
+
+        $response = $this->getJson('/api/admin/templates/' . $template->getKey());
+
+        $response->assertUnauthorized();
     }
 }
