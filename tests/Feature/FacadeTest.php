@@ -52,7 +52,7 @@ class FacadeTest extends TestCase
         $registeredEvents = Template::getRegisteredEventsWithTokens();
         $this->assertEquals([
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
-            'assignableClass' => null,
+            'assignable_class' => null,
             "variables" =>  [
                 0 => "@VarUserEmail",
                 1 => "@VarFriendEmail"

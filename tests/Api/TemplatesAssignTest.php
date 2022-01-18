@@ -48,7 +48,10 @@ class TemplatesAssignTest extends TestCase
         TemplateSection::factory(['key' => 'title', 'template_id' => $template->getKey()])->create();
         TemplateSection::factory(['key' => 'content', 'template_id' => $template->getKey(), 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->create();
 
-        $this->assertNull($template->assignable);
+        $this->assertEmpty($template->templatables);
+
+        $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
+        $this->assertNull($templateFound);
 
         $response = $this->actingAs($this->user, 'api')->postJson($this->uri($template->id) . '/assign', [
             'assignable_id' => $user->getKey()
@@ -56,12 +59,37 @@ class TemplatesAssignTest extends TestCase
         $response->assertOk();
 
         $template->refresh();
-        $this->assertNotNull($template->assignable);
-        $this->assertEquals($user->getKey(), $template->assignable->getKey());
-        $this->assertEquals($user->email, $template->assignable->email);
+        $this->assertNotEmpty($template->templatables);
+        $this->assertEquals($user->getKey(), $template->templatables->first()->templatable->getKey());
+        $this->assertEquals($user->email, $template->templatables->first()->templatable->email);
 
         $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
         $this->assertEquals($template->getKey(), $templateFound->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates');
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'assignables' => [
+                [
+                    'class' => get_class($user),
+                    'id' => $user->getKey()
+                ]
+            ]
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates/assigned', ['assignable_class' => get_class($user), 'assignable_id' => $user->getKey()]);
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonFragment([
+            'id' => $template->getKey(),
+            'name' => $template->name,
+            'assignables' => [
+                [
+                    'class' => get_class($user),
+                    'id' => $user->getKey()
+                ]
+            ]
+        ]);
 
         $response = $this->actingAs($this->user, 'api')->postJson($this->uri($template->id) . '/unassign', [
             'assignable_id' => $user->getKey()
@@ -69,9 +97,13 @@ class TemplatesAssignTest extends TestCase
         $response->assertOk();
 
         $template->refresh();
-        $this->assertNull($template->assignable);
+        $this->assertEmpty($template->templatables);
 
         $templateFound = $this->repository->findTemplateAssigned(TestEventWithGetters::class, TestChannel::class, User::class, $user->getKey());
         $this->assertNull($templateFound);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates/assigned', ['assignable_class' => get_class($user), 'assignable_id' => $user->getKey()]);
+        $response->assertOk();
+        $response->assertJsonCount(0, 'data');
     }
 }

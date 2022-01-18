@@ -20,6 +20,24 @@ interface TemplatesAdminApiContract
      *     security={
      *         {"passport": {}},
      *     },
+     *     @OA\Parameter(
+     *         description="Channel class for filtering",
+     *         in="query",
+     *         name="channel",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         description="Event class for filtering",
+     *         in="query",
+     *         name="event",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="list of available templates",

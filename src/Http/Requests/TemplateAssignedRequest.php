@@ -6,12 +6,12 @@ use EscolaLms\Templates\Models\Template;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class TemplateListingRequest extends FormRequest
+class TemplateAssignedRequest extends FormRequest
 {
     /**
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return Gate::allows('list', Template::class);
     }
@@ -21,11 +21,11 @@ class TemplateListingRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'event' => ['sometimes', 'string'],
-            'channel' => ['sometimes', 'string'],
+            'assignable_class' => ['required', 'string'],
+            'assignable_id' => ['required', 'int', 'nullable'],
         ];
     }
 }

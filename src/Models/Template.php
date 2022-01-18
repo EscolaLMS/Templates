@@ -68,9 +68,9 @@ class Template extends Model
         return $this->hasMany(TemplateSection::class);
     }
 
-    public function assignable(): MorphTo
+    public function templatables(): HasMany
     {
-        return $this->morphTo();
+        return $this->hasMany(Templatable::class);
     }
 
     public function previewContent(?User $user = null): array

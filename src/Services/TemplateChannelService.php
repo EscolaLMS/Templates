@@ -3,15 +3,17 @@
 namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Templates\Contracts\TemplateChannelContract;
+use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use Exception;
 use InvalidArgumentException;
-use EscolaLms\Templates\Core\TemplateSectionSchema;
 
 class TemplateChannelService implements TemplateChannelServiceContract
 {
     protected static array $channels = [];
+
+    protected array $sectionValidationErrors = [];
 
     public function register(string $class): void
     {
@@ -44,38 +46,60 @@ class TemplateChannelService implements TemplateChannelServiceContract
 
     public function validateTemplateSections(string $class, array $sections): bool
     {
+        $this->sectionValidationErrors = [];
+
         if (!in_array($class, self::$channels)) {
+            $this->sectionValidationErrors[] = __('Channel not registered');
             return false;
         }
         foreach ($sections as $section => $content) {
-            if (in_array($section, $class::sectionsRequired()) && empty($content)) {
-                return false;
+            /** @var ?TemplateSectionSchema $sectionSchema */
+            $sectionSchema = $class::section($section);
+            if (is_null($sectionSchema)) {
+                // skip sections not used by given Channel
+                continue;
             }
-            switch ($class::section($section)->getType()) {
+            if (in_array($section, $class::sectionsRequired()) && empty($content)) {
+                $this->sectionValidationErrors[] = __('Empty content for required section :section', ['section' => $section]);
+                continue;
+            }
+            switch ($sectionSchema->getType()) {
                 case TemplateSectionTypeEnum::SECTION_HTML():
                 case TemplateSectionTypeEnum::SECTION_MJML():
                     if ($content === strip_tags($content)) {
-                        return false;
+                        $this->sectionValidationErrors[] = __(':section must contain HTML/MJML', ['section' => $section]);
                     }
                     break;
                 case TemplateSectionTypeEnum::SECTION_TEXT():
                     if ($content !== strip_tags($content)) {
-                        return false;
+                        $this->sectionValidationErrors[] = __(':section must not contain HTML/MJML', ['section' => $section]);
                     }
                     break;
                 case TemplateSectionTypeEnum::SECTION_URL():
                     if (!filter_var($content, FILTER_VALIDATE_URL)) {
-                        return false;
+                        $this->sectionValidationErrors[] = __(':section must be valid url', ['section' => $section]);
                     }
                     break;
-
                 case TemplateSectionTypeEnum::SECTION_FABRIC();
-                    // TODO is there any validation for fabric js
-                    return true;
+                    if (!$this->isJson($content)) {
+                        $this->sectionValidationErrors[] = __(':section must be valid JSON', ['section' => $section]);
+                    }
+                    break;
                 default:
                     break;
             }
         }
-        return true;
+
+        return empty($this->sectionValidationErrors);
+    }
+
+    public function lastValidationErrors(): array
+    {
+        return $this->sectionValidationErrors;
+    }
+
+    private function isJson(string $json): bool
+    {
+        return is_array(json_decode($json, true));
     }
 }
