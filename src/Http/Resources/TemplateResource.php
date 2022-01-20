@@ -22,7 +22,10 @@ class TemplateResource extends JsonResource
             'channel' => $this->channel,
             'default' => $this->default,
             'sections' => $this->sections,
-            'assignables' => $this->templatables->map(fn (Templatable $templatable) => ['class' => $templatable->templatable_type, 'id' => $templatable->templatable_id]),
+            'variable_class' => $this->variable_class,
+            'assignable_class' => $this->assignable_class,
+            'is_assignable' => $this->is_assignable,
+            'assignables' => ($this->is_assignable) ? $this->templatables->map(fn (Templatable $templatable) => ['class' => $templatable->templatable_type, 'id' => $templatable->templatable_id]) : [],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

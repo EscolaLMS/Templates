@@ -10,9 +10,9 @@ use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class TemplateService implements TemplateServiceContract
@@ -128,17 +128,14 @@ class TemplateService implements TemplateServiceContract
     public function assignTemplateToModel(Template $template, int $assignable_id): Template
     {
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
+
         $assignableClass = $variableClass::assignableClass();
 
+        if (empty($assignableClass)) {
+            throw new Exception('This Template can not be assigned.');
+        }
+
         if (!class_exists($assignableClass)) {
-            Log::debug('Assign template to model', [
-                'template' => $template->getKey(),
-                'assignable_id' => $assignable_id,
-                'event' => $template->event,
-                'channel' => $template->channel,
-                'variableClass' => $variableClass,
-                'assignableClass' => $assignableClass,
-            ]);
             throw new RuntimeException('Class "' . $assignableClass . '" not found; required by class "' . $variableClass . '" for Template assignment.');
         }
 

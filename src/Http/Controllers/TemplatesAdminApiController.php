@@ -98,6 +98,10 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     {
         $template = $request->getTemplate();
 
+        if (!$template->is_assignable) {
+            return $this->sendError(__('Template is not assignable.'));
+        }
+
         $this->templateService->assignTemplateToModel($template, $request->input('assignable_id'));
 
         return $this->sendResponseForResource(TemplateResource::make($template));
@@ -106,6 +110,10 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     public function unassign(TemplateAssignRequest $request, $id): Response
     {
         $template = $request->getTemplate();
+
+        if (!$template->is_assignable) {
+            return $this->sendError(__('Template is not assignable.'));
+        }
 
         $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
 
