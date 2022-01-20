@@ -12,6 +12,7 @@ use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class TemplateService implements TemplateServiceContract
@@ -130,7 +131,15 @@ class TemplateService implements TemplateServiceContract
         $assignableClass = $variableClass::assignableClass();
 
         if (!class_exists($assignableClass)) {
-            throw new RuntimeException('Assignable Class not found: ' . $assignableClass);
+            Log::debug('Assign template to model', [
+                'template' => $template->getKey(),
+                'assignable_id' => $assignable_id,
+                'event' => $template->event,
+                'channel' => $template->channel,
+                'variableClass' => $variableClass,
+                'assignableClass' => $assignableClass,
+            ]);
+            throw new RuntimeException('Class "' . $assignableClass . '" not found; required by class "' . $variableClass . '" for Template assignment.');
         }
 
         $assignable = $assignableClass::findOrFail($assignable_id);
