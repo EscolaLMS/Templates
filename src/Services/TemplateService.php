@@ -12,6 +12,7 @@ use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use RuntimeException;
 
 class TemplateService implements TemplateServiceContract
 {
@@ -128,11 +129,12 @@ class TemplateService implements TemplateServiceContract
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
         $assignableClass = $variableClass::assignableClass();
 
-        if (class_exists($assignableClass)) {
-            $assignable = $assignableClass::findOrFail($assignable_id);
-
-            Templatable::updateOrCreate(['event' => $template->event, 'channel' => $template->channel, 'templatable_type' => $assignableClass, 'templatable_id' => $assignable->getKey()], ['template_id' => $template->getKey()]);
+        if (!class_exists($assignableClass)) {
+            throw new RuntimeException('Assignable Class not found: ' . $assignableClass);
         }
+
+        $assignable = $assignableClass::findOrFail($assignable_id);
+        Templatable::updateOrCreate(['event' => $template->event, 'channel' => $template->channel, 'templatable_type' => $assignableClass, 'templatable_id' => $assignable->getKey()], ['template_id' => $template->getKey()]);
 
         return $template->refresh();
     }
