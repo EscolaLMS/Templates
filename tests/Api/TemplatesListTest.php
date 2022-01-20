@@ -2,9 +2,12 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
+use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Tests\Mock\TestChannel;
 use EscolaLms\Templates\Tests\Mock\TestEventWithGettersAndToArray;
+use EscolaLms\Templates\Tests\Mock\TestVariablesWithAssignableClass;
 use EscolaLms\Templates\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -13,6 +16,13 @@ class TemplatesListTest extends TestCase
     use DatabaseTransactions;
 
     private string $uri = '/api/templates';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        FacadesTemplate::register(TestEventWithGettersAndToArray::class, TestChannel::class, TestVariablesWithAssignableClass::class);
+    }
 
     public function testAdminCanListEmpty(): void
     {
@@ -76,7 +86,16 @@ class TemplatesListTest extends TestCase
         $response->assertJsonCount(1, 'data');
         $response->assertJsonFragment([
             'data' => [
-                array_merge($template->toArray(), ['assignables' => [], 'sections' => []])
+                array_merge(
+                    $template->toArray(),
+                    [
+                        'is_assignable' => true,
+                        'assignable_class' => User::class,
+                        'variable_class' => TestVariablesWithAssignableClass::class,
+                        'assignables' => [],
+                        'sections' => []
+                    ]
+                )
             ]
         ]);
     }
