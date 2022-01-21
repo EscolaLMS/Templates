@@ -3,12 +3,12 @@
 namespace EscolaLms\Templates\Models;
 
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Database\Factories\TemplateFactory;
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
+use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use EscolaLms\Templates\Database\Factories\TemplateFactory;
-use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @OA\Schema(
@@ -92,5 +92,20 @@ class Template extends Model
         /** @var TemplateServiceContract $service */
         $service = app(TemplateServiceContract::class);
         return $service->isValid($this);
+    }
+
+    public function getIsAssignableAttribute(): bool
+    {
+        return !empty($this->assignable_class) && class_exists($this->assignable_class);
+    }
+
+    public function getAssignableClassAttribute(): ?string
+    {
+        return $this->variable_class ? $this->variable_class::assignableClass() : null;
+    }
+
+    public function getVariableClassAttribute(): ?string
+    {
+        return FacadesTemplate::getVariableClassName($this->event, $this->channel);
     }
 }

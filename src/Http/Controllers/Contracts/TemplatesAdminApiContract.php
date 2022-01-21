@@ -2,11 +2,13 @@
 
 namespace EscolaLms\Templates\Http\Controllers\Contracts;
 
-use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
+use EscolaLms\Templates\Http\Requests\TemplateAssignedRequest;
+use EscolaLms\Templates\Http\Requests\TemplateAssignRequest;
 use EscolaLms\Templates\Http\Requests\TemplateCreateRequest;
+use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
 use EscolaLms\Templates\Http\Requests\TemplateListingRequest;
-use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
+use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -334,4 +336,151 @@ interface TemplatesAdminApiContract
      * @return Response
      */
     public function preview(TemplateReadRequest $request, int $id): Response;
+
+    /**
+     * @OA\Post(
+     *     path="/api/admin/templates/{id}/assign",
+     *     summary="Assign template to model (of class assignable to the Variable Set)",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Unique id of template",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="assignable_id",
+     *                  type="integer",
+     *              ),
+     *          )
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Preview details",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateAssignRequest $request
+     * @return Response
+     */
+    public function assign(TemplateAssignRequest $request, $id): Response;
+
+    /**
+     * @OA\Post(
+     *     path="/api/admin/templates/{id}/unassign",
+     *     summary="Remove template assignment to model",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Unique id of template",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="assignable_id",
+     *                  type="integer",
+     *              ),
+     *          )
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Preview details",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateAssignRequest $request
+     * @return Response
+     */
+    public function unassign(TemplateAssignRequest $request, $id): Response;
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/templates/assigned",
+     *     summary="Get Template assigned to the model",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Class of assignable model for which we want to fetch assigned Template",
+     *         in="query",
+     *         name="assignable_class",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         description="Id of assignable model for which we want to fetch assigned Template",
+     *         in="query",
+     *         name="assignable_id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Preview details",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateAssignedRequest $request
+     * @return Response
+     */
+    public function assigned(TemplateAssignedRequest $request): Response;
 }
