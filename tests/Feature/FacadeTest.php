@@ -65,7 +65,7 @@ class FacadeTest extends TestCase
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
             'assignable_class' => null,
             "variables" =>  [
-                0 => "@VarSettingsSettingText",
+                0 => "@GlobalSettingsSettingText",
                 1 => "@VarUserEmail",
                 2 => "@VarFriendEmail"
             ],
@@ -100,6 +100,9 @@ class FacadeTest extends TestCase
                 ]
             ]
         ], $registeredEvents[TestEventWithGettersAndToArray::class][TestChannel::class]);
+        $this->assertEquals([
+            "@GlobalSettingsSettingText" => "text",
+        ], $registeredEvents['user_settings']);
     }
 
     public function testRegisteringError()

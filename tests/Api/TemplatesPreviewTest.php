@@ -50,6 +50,14 @@ class TemplatesPreviewTest extends TestCase
             'enumerable' => true,
             'type' => 'text'
         ]);
+        Setting::create([
+            'key' => 'global',
+            'group' => 'test',
+            'value' => 'Global value',
+            'public' => true,
+            'enumerable' => true,
+            'type' => 'file'
+        ]);
 
         $this->authenticateAsAdmin();
         $response = $this->actingAs($this->user, 'api')->getJson(
@@ -65,9 +73,10 @@ class TemplatesPreviewTest extends TestCase
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
             'assignable_class' => null,
             "variables" =>  [
-                0 => "@VarSettingsSettingText",
-                1 => "@VarUserEmail",
-                2 => "@VarFriendEmail"
+                0 => "@GlobalSettingsSettingText",
+                1 => "@GlobalSettingsGlobalFile",
+                2 => "@VarUserEmail",
+                3 => "@VarFriendEmail",
             ],
             "required_variables" =>  [
                 0 => "@VarUserEmail",
@@ -100,6 +109,10 @@ class TemplatesPreviewTest extends TestCase
                 ]
             ]
         ], $variables[TestEventWithGetters::class][TestChannel::class]);
+        $this->assertEquals([
+            "@GlobalSettingsSettingText" => "text",
+            "@GlobalSettingsGlobalFile" => "file"
+        ], $variables['user_settings']);
     }
 
     public function testAdminCanPreviewTemplateData(): void

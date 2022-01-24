@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Core\SettingsVariables;
 use EscolaLms\Templates\Core\TemplatePreview;
 use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Events\EventWrapper;
@@ -62,6 +63,7 @@ class TemplateEventService implements TemplateEventServiceContract
     public function getRegisteredEventsWithTokens(): array
     {
         $result = [];
+
         foreach ($this->events as $event => $channels) {
             foreach ($channels as $channel => $variableClass) {
                 $sections = [];
@@ -92,6 +94,9 @@ class TemplateEventService implements TemplateEventServiceContract
                 ];
             }
         }
+
+        $result['user_settings'] = SettingsVariables::getSettingsTypes();
+
         return $result;
     }
 
