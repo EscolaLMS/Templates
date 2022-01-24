@@ -20,7 +20,7 @@ abstract class SettingsVariables
         $result = [];
         foreach ($settings as $setting) {
             $key =  Str::ucfirst($setting->key) .  Str::ucfirst($setting->type);
-            $name = '@VarSettings' . Str::ucfirst(Str::camel(preg_replace('/[^a-z0-9]+/i', ' ', ($key))));
+            $name = '@GlobalSettings' . Str::ucfirst(Str::camel(preg_replace('/[^a-z0-9]+/i', ' ', ($key))));
             $result[$name] = [
                 'key' => $setting->key,
                 'group' => $setting->group,
@@ -35,6 +35,11 @@ abstract class SettingsVariables
     public static function getSettingsKeys(): array
     {
         return array_keys(static::settings());
+    }
+
+    public static function getSettingsTypes(): array
+    {
+        return array_map(fn($item) => $item['type'], static::settings());
     }
 
     public static function getSettingsValues(): array
