@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Tests\Feature;
 
 use BadMethodCallException;
 use EscolaLms\Core\Tests\CreatesUsers;
+use EscolaLms\Settings\Models\Setting;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Facades\Template;
 use EscolaLms\Templates\Tests\Mock\TestChannel;
@@ -25,6 +26,16 @@ class FacadeTest extends TestCase
 
     public function testRegistering()
     {
+        Setting::query()->delete();
+        Setting::create([
+            'key' => 'setting',
+            'group' => 'test',
+            'value' => 'Test value',
+            'public' => true,
+            'enumerable' => true,
+            'type' => 'text'
+        ]);
+
         Template::register(TestEventWithGettersAndToArray::class, TestChannel::class, TestVariables::class);
         Template::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
         Template::register(TestEventWithToArray::class, TestChannel::class, TestVariables::class);
@@ -54,8 +65,9 @@ class FacadeTest extends TestCase
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
             'assignable_class' => null,
             "variables" =>  [
-                0 => "@VarUserEmail",
-                1 => "@VarFriendEmail"
+                0 => "@VarSettingsSettingText",
+                1 => "@VarUserEmail",
+                2 => "@VarFriendEmail"
             ],
             "required_variables" =>  [
                 0 => "@VarUserEmail",

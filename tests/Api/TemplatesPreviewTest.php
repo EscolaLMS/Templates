@@ -65,7 +65,7 @@ class TemplatesPreviewTest extends TestCase
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
             'assignable_class' => null,
             "variables" =>  [
-                0 => '@VarSettingsSettingText',
+                0 => "@VarSettingsSettingText",
                 1 => "@VarUserEmail",
                 2 => "@VarFriendEmail"
             ],
