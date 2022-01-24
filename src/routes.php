@@ -9,6 +9,7 @@ Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], 
 
     Route::get('/events', [TemplatesAdminApiController::class, 'events']);
     Route::get('/variables', [TemplatesAdminApiController::class, 'variables']);
+    Route::get('/assignable', [TemplatesAdminApiController::class, 'assignable']);
     Route::get('/assigned', [TemplatesAdminApiController::class, 'assigned']);
 
     Route::get('/{id}', [TemplatesAdminApiController::class, 'read']);

@@ -34,6 +34,34 @@ class TemplatesAssignTest extends TestCase
         return sprintf('/api/admin/templates/%s', $id);
     }
 
+    public function testAdminCanListAssignable(): void
+    {
+        $this->authenticateAsAdmin();
+
+        $template = Template::factory()->createOne([
+            'event' => TestEventWithGetters::class,
+            'channel' => TestChannel::class,
+        ]);
+        TemplateSection::factory(['key' => 'title', 'template_id' => $template->getKey()])->create();
+        TemplateSection::factory(['key' => 'content', 'template_id' => $template->getKey(), 'content' => TestVariables::VAR_USER_EMAIL . '_' . TestVariables::VAR_FRIEND_EMAIL])->create();
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates/assignable');
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $template->getKey()]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates/assignable', [
+            'assignable_class' => User::class,
+        ]);
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $template->getKey()]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates/assignable', [
+            'assignable_class' => Template::class, // or any other class, this is not important
+        ]);
+        $response->assertOk();
+        $response->assertJsonMissing(['id' => $template->getKey()]);
+    }
+
     public function testAdminCanAssignTemplate(): void
     {
         $this->authenticateAsAdmin();

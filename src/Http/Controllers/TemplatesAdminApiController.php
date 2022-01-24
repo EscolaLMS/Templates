@@ -9,6 +9,7 @@ use EscolaLms\Templates\Http\Requests\TemplateAssignedRequest;
 use EscolaLms\Templates\Http\Requests\TemplateAssignRequest;
 use EscolaLms\Templates\Http\Requests\TemplateCreateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
+use EscolaLms\Templates\Http\Requests\TemplateListAssignableRequest;
 use EscolaLms\Templates\Http\Requests\TemplateListingRequest;
 use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
@@ -118,6 +119,13 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
         $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
 
         return $this->sendResponseForResource(TemplateResource::make($template));
+    }
+
+    public function assignable(TemplateListAssignableRequest $request): Response
+    {
+        $templates = FacadesTemplate::listAssignableTemplates($request->input('assignable_class'));
+
+        return $this->sendResponseForResource(TemplateResource::collection($templates));
     }
 
     public function assigned(TemplateAssignedRequest $request): Response

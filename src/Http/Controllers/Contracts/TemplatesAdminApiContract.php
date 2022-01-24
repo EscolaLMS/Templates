@@ -6,6 +6,7 @@ use EscolaLms\Templates\Http\Requests\TemplateAssignedRequest;
 use EscolaLms\Templates\Http\Requests\TemplateAssignRequest;
 use EscolaLms\Templates\Http\Requests\TemplateCreateRequest;
 use EscolaLms\Templates\Http\Requests\TemplateDeleteRequest;
+use EscolaLms\Templates\Http\Requests\TemplateListAssignableRequest;
 use EscolaLms\Templates\Http\Requests\TemplateListingRequest;
 use EscolaLms\Templates\Http\Requests\TemplateReadRequest;
 use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
@@ -434,6 +435,46 @@ interface TemplatesAdminApiContract
      * @return Response
      */
     public function unassign(TemplateAssignRequest $request, $id): Response;
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/templates/assignable",
+     *     summary="Get Templates that can be assigned to model",
+     *     tags={"Templates"},
+     *     security={
+     *         {"passport": {}},
+     *     },
+     *     @OA\Parameter(
+     *         description="Class of assignable model for which we want to find assignable Templates",
+     *         in="query",
+     *         name="assignable_class",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of Templates that can be assigned",
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
+     * )
+     *
+     * @param TemplateAssignedRequest $request
+     * @return Response
+     */
+    public function assignable(TemplateListAssignableRequest $request): Response;
 
     /**
      * @OA\Get(
