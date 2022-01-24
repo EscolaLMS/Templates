@@ -7,6 +7,7 @@ use EscolaLms\Templates\Events\EventWrapper;
 use EscolaLms\Templates\Models\Template as TemplateModel;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
 use EscolaLms\Templates\Testing\TemplateFake;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static            void createDefaultTemplatesForChannel(string $channelClass)
  * @method static TemplatePreview sendPreview(\EscolaLms\Core\Models\User $user, \EscolaLms\Templates\Models\Template $template)
  * @method static   TemplateModel processTemplateAfterSaving(\EscolaLms\Templates\Models\Template $template)
+ * @method static      Collection listAssignableTemplates(?string $modelClass = null)
  * 
  * @see \EscolaLms\Templates\Services\TemplateEventService
  */

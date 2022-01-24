@@ -12,6 +12,8 @@ use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
 class TemplateEventService implements TemplateEventServiceContract
@@ -166,5 +168,31 @@ class TemplateEventService implements TemplateEventServiceContract
         $channelClass = $template->channel;
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $channelClass);
         return $variableClass::processTemplateAfterSaving($channelClass::processTemplateAfterSaving($template));
+    }
+
+    public function listAssignableTemplates(?string $assignableClass = null): Collection
+    {
+        $filters = [];
+        foreach ($this->events as $eventClass => $channels) {
+            foreach ($channels as $channelClass => $variableClass) {
+                if ($variableClass::assignableClass() && (is_null($assignableClass) || $variableClass::assignableClass() === $assignableClass)) {
+                    $filters[] = [
+                        'event' => $eventClass,
+                        'channel' => $channelClass
+                    ];
+                }
+            }
+        }
+
+        $query = Template::query();
+        $andor = 'and';
+        foreach ($filters as $filter) {
+            $query->where(fn (Builder $query) => $query->where('event', $filter['event'])->where('channel', $filter['channel']), null, null, $andor);
+            $andor = 'or';
+        }
+        if (!is_null($assignableClass) && empty($filters)) {
+            $query->where('id', '=', -1); // return zero results if no event/channel pair were founds for assignableClass
+        }
+        return $query->get();
     }
 }

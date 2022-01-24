@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Services\Contracts;
 
 use EscolaLms\Templates\Events\EventWrapper;
 use EscolaLms\Templates\Models\Template;
+use Illuminate\Database\Eloquent\Collection;
 
 interface TemplateEventServiceContract
 {
@@ -14,4 +15,5 @@ interface TemplateEventServiceContract
     public function getRegisteredEventsWithTokens(): array;
     public function getRegisteredChannels(): array;
     public function processTemplateAfterSaving(Template $template): Template;
+    public function listAssignableTemplates(?string $assignableClass = null): Collection;
 }
