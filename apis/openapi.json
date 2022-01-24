@@ -432,6 +432,45 @@
                 ]
             }
         },
+        "/api/admin/templates/assignable": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Get Templates that can be assigned to model",
+                "operationId": "a98364b5f0b7ab375c101171aee1263f",
+                "parameters": [
+                    {
+                        "name": "assignable_class",
+                        "in": "query",
+                        "description": "Class of assignable model for which we want to find assignable Templates",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of Templates that can be assigned"
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/api/admin/templates/assigned": {
             "get": {
                 "tags": [
