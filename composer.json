@@ -6,6 +6,7 @@
     "php": ">=7.4 | >=8.0",
     "doctrine/dbal": "^2|^3",
     "escolalms/core": "^1.2",
+    "escolalms/settings": "^0",
     "fakerphp/faker": "^1",
     "laravel/framework": ">=8.0"
   },

@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Tests\Api;
 
+use EscolaLms\Settings\Models\Setting;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
@@ -40,6 +41,16 @@ class TemplatesPreviewTest extends TestCase
 
     public function testAdminCanListVariables(): void
     {
+        Setting::query()->delete();
+        Setting::create([
+            'key' => 'setting',
+            'group' => 'test',
+            'value' => 'Test value',
+            'public' => true,
+            'enumerable' => true,
+            'type' => 'text'
+        ]);
+
         $this->authenticateAsAdmin();
         $response = $this->actingAs($this->user, 'api')->getJson(
             '/api/admin/templates/variables'
@@ -54,8 +65,9 @@ class TemplatesPreviewTest extends TestCase
             "class" => "EscolaLms\Templates\Tests\Mock\TestVariables",
             'assignable_class' => null,
             "variables" =>  [
-                0 => "@VarUserEmail",
-                1 => "@VarFriendEmail"
+                0 => "@VarSettingsSettingText",
+                1 => "@VarUserEmail",
+                2 => "@VarFriendEmail"
             ],
             "required_variables" =>  [
                 0 => "@VarUserEmail",

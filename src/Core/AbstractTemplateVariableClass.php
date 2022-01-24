@@ -10,7 +10,7 @@ abstract class AbstractTemplateVariableClass extends BasicEnum implements Templa
 {
     public static function variables(): array
     {
-        return static::getValues();
+        return array_merge(SettingsVariables::getSettingsKeys(), static::getValues());
     }
 
     public static function processTemplateAfterSaving(Template $template): Template
