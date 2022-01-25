@@ -6,9 +6,9 @@ use EscolaLms\Core\Enums\BasicEnum;
 
 class TemplatesPermissionsEnum extends BasicEnum
 {
-    const TEMPLATES_CREATE = 'templates_create';
-    const TEMPLATES_DELETE = 'templates_delete';
-    const TEMPLATES_UPDATE = 'templates_update';
-    const TEMPLATES_LIST = 'templates_list';
-    const TEMPLATES_READ = 'templates_read';
+    const TEMPLATES_CREATE = 'template_create';
+    const TEMPLATES_DELETE = 'template_delete';
+    const TEMPLATES_UPDATE = 'template_update';
+    const TEMPLATES_LIST = 'template_list';
+    const TEMPLATES_READ = 'template_read';
 }
