@@ -105,7 +105,7 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
         $this->templateService->assignTemplateToModel($template, $request->input('assignable_id'));
 
-        return $this->sendResponseForResource(TemplateResource::make($template));
+        return $this->sendResponseForResource(TemplateResource::make($template), 'Template assigned');
     }
 
     public function unassign(TemplateAssignRequest $request, $id): Response
@@ -118,20 +118,20 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
         $this->templateService->unassignTemplateFromModel($template, $request->input('assignable_id'));
 
-        return $this->sendResponseForResource(TemplateResource::make($template));
+        return $this->sendResponseForResource(TemplateResource::make($template), 'Template unassigned');
     }
 
     public function assignable(TemplateListAssignableRequest $request): Response
     {
         $templates = FacadesTemplate::listAssignableTemplates($request->input('assignable_class'));
 
-        return $this->sendResponseForResource(TemplateResource::collection($templates));
+        return $this->sendResponseForResource(TemplateResource::collection($templates), 'List of assignable templates fetched successfully');
     }
 
     public function assigned(TemplateAssignedRequest $request): Response
     {
         $templates = $this->templateService->findTemplatesAssignedToModel($request->input('assignable_class'), $request->input('assignable_id'));
 
-        return $this->sendResponseForResource(TemplateResource::collection($templates));
+        return $this->sendResponseForResource(TemplateResource::collection($templates), 'List of assigned templates fetched successfully');
     }
 }
