@@ -37,7 +37,7 @@ class UserTest extends TestCase
         $admin = $this->makeAdmin();
 
         $this->response = $this->actingAs($admin)->json('PATCH', '/api/admin/users/' . $user->getKey(), [
-            'notification_channel' => [
+            'notification_channels' => [
                 "EscolaLms\\TemplatesEmail\\Core\\EmailChannel",
                 "EscolaLms\\TemplatesSms\\Core\\SmsChannel"
             ]
@@ -46,7 +46,7 @@ class UserTest extends TestCase
         $this->response
             ->assertOk()
             ->assertJsonFragment([
-                'notification_channel' => [
+                'notification_channels' => [
                     "EscolaLms\\TemplatesEmail\\Core\\EmailChannel",
                     "EscolaLms\\TemplatesSms\\Core\\SmsChannel"
                 ]
@@ -54,7 +54,7 @@ class UserTest extends TestCase
 
         $this->response = $this->actingAs($admin)
             ->json('PATCH', '/api/admin/users/' . $user->getKey(), [
-                'notification_channel' => [
+                'notification_channels' => [
                     'EscolaLms\\TemplatesSms\\Core\\SmsChannel'
                 ]
             ]);
@@ -62,9 +62,9 @@ class UserTest extends TestCase
         $this->response
             ->assertOk()
             ->assertJsonFragment([
-                'notification_channel' => ['EscolaLms\\TemplatesSms\\Core\\SmsChannel']
+                'notification_channels' => ['EscolaLms\\TemplatesSms\\Core\\SmsChannel']
             ])
-            ->assertJsonMissing(['notification_channel' => ['EscolaLms\\TemplatesEmail\\Core\\EmailChannel']]);
+            ->assertJsonMissing(['notification_channels' => ['EscolaLms\\TemplatesEmail\\Core\\EmailChannel']]);
     }
 
     public function testGetUser(): void
@@ -73,7 +73,7 @@ class UserTest extends TestCase
         $admin = $this->makeAdmin();
 
         $this->response = $this->actingAs($admin)->json('PATCH', '/api/admin/users/' . $user->getKey(), [
-            'notification_channel' => [
+            'notification_channels' => [
                 "EscolaLms\\TemplatesEmail\\Core\\EmailChannel",
                 "EscolaLms\\TemplatesSms\\Core\\SmsChannel"
             ]
@@ -87,7 +87,7 @@ class UserTest extends TestCase
                 'id' => $user->getKey(),
                 'email' => $user->email,
                 'first_name' => $user->first_name,
-                'notification_channel' => [
+                'notification_channels' => [
                     "EscolaLms\\TemplatesEmail\\Core\\EmailChannel",
                     "EscolaLms\\TemplatesSms\\Core\\SmsChannel"
                 ]

@@ -14,7 +14,7 @@ class AddNotificationChannelToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->json('notification_channel')->nullable();
+            $table->json('notification_channels')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddNotificationChannelToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('notification_channel');
+            $table->dropColumn('notification_channels');
         });
     }
 }

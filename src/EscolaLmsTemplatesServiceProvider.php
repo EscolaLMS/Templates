@@ -53,15 +53,15 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
         }
 
         \EscolaLms\Auth\Http\Resources\UserResource::extend(fn($thisObj) => [
-            'notification_channel' => json_decode($thisObj->notification_channel),
+            'notification_channels' => json_decode($thisObj->notification_channels),
         ]);
 
         \EscolaLms\Auth\Dtos\UserUpdateDto::extendConstructor([
-            'notification_channel' => fn ($request) => json_encode($request->input('notification_channel')),
+            'notification_channels' => fn ($request) => json_encode($request->input('notification_channels')),
         ]);
 
         \EscolaLms\Auth\Dtos\UserUpdateDto::extendToArray([
-            'notification_channel' => fn ($thisObj) => $thisObj->notification_channel
+            'notification_channels' => fn ($thisObj) => $thisObj->notification_channels
         ]);
     }
 }
