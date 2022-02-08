@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Tests;
 
+use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
 use EscolaLms\Core\Enums\UserRole;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
 use EscolaLms\Templates\Database\Seeders\PermissionTableSeeder;
@@ -30,6 +31,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
             PermissionServiceProvider::class,
             EscolaLmsTemplatesServiceProvider::class,
             EscolaLmsSettingsServiceProvider::class,
+            EscolaLmsAuthServiceProvider::class
         ];
     }
 
