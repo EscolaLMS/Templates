@@ -35,7 +35,7 @@ jobs:
         run: composer update
 
       - name: require auth
-          run: COMPOSER_ROOT_VERSION=0.9.9 composer require escolalms/auth
+        run: COMPOSER_ROOT_VERSION=0.9.9 composer require escolalms/auth
 
       - name: Clear config
         run: vendor/bin/testbench config:clear
@@ -68,6 +68,9 @@ jobs:
 
       - name: Update composer
         run: composer update
+
+      - name: require auth
+        run: COMPOSER_ROOT_VERSION=0.9.9 composer require escolalms/auth
 
       - name: Setup environment
         run: cp env/postgres/* .
