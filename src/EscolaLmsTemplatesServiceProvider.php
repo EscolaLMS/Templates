@@ -43,5 +43,25 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
+        $this->extendResources();
+    }
+
+    private function extendResources(): void
+    {
+        if (!class_exists(\EscolaLms\Auth\EscolaLmsAuthServiceProvider::class)) {
+            return;
+        }
+
+        \EscolaLms\Auth\Http\Resources\UserResource::extend(fn($thisObj) => [
+            'notification_channels' => json_decode($thisObj->notification_channels),
+        ]);
+
+        \EscolaLms\Auth\Dtos\UserUpdateDto::extendConstructor([
+            'notification_channels' => fn ($request) => json_encode($request->input('notification_channels')),
+        ]);
+
+        \EscolaLms\Auth\Dtos\UserUpdateDto::extendToArray([
+            'notification_channels' => fn ($thisObj) => $thisObj->notification_channels
+        ]);
     }
 }
