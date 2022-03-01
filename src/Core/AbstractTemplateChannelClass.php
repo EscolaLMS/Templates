@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Templates\Core;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Contracts\TemplateChannelContract;
 use EscolaLms\Templates\Models\Template;
 
@@ -30,5 +31,12 @@ abstract class AbstractTemplateChannelClass implements TemplateChannelContract
     public static function processTemplateAfterSaving(Template $template): Template
     {
         return $template;
+    }
+
+    public static function channelAvailable(User $user): bool
+    {
+        return
+            isset($user->notification_channels)
+            && in_array(self::class, json_decode($user->notification_channels));
     }
 }
