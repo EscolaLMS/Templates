@@ -21,4 +21,6 @@ interface TemplateChannelContract
     public static function sectionExists(string $sectionKey): bool;
 
     public static function processTemplateAfterSaving(Template $template): Template;
+
+    public static function channelAvailable(User $user): bool;
 }
