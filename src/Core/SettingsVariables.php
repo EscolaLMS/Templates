@@ -3,33 +3,39 @@
 namespace EscolaLms\Templates\Core;
 
 use EscolaLms\Settings\Models\Setting;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 abstract class SettingsVariables
 {
+    private static array $settings = [];
+
     public static function settings(): array
     {
-        $settings = Setting::where([
-            ['public', true],
-            ['enumerable', true],
-            ['type', '!=', 'json']
-        ])->get();
+        if (!self::$settings) {
+            self::getSettings();
+        }
 
         $result = [];
-        foreach ($settings as $setting) {
-            $key =  Str::ucfirst($setting->key) .  Str::ucfirst($setting->type);
+        foreach (self::$settings as $setting) {
+            $key =  Str::ucfirst($setting['key']) .  Str::ucfirst($setting['type']);
             $name = '@GlobalSettings' . Str::ucfirst(Str::camel(preg_replace('/[^a-z0-9]+/i', ' ', ($key))));
             $result[$name] = [
-                'key' => $setting->key,
-                'group' => $setting->group,
-                'value' => $setting->value,
-                'type' => $setting->type,
+                'key' => $setting['key'],
+                'group' => $setting['group'],
+                'value' => $setting['value'],
+                'type' => $setting['type'],
             ];
         }
 
         return $result;
+    }
+
+    public static function clearSettings(): void
+    {
+        self::$settings = [];
     }
 
     public static function getSettingsKeys(): array
@@ -80,5 +86,16 @@ abstract class SettingsVariables
     public static function textParser(string $text): string
     {
         return $text;
+    }
+
+    private static function getSettings(): void
+    {
+        self::$settings = Setting::where([
+            ['public', true],
+            ['enumerable', true],
+            ['type', '!=', 'json']
+        ])
+            ->get()
+            ->toArray();
     }
 }
