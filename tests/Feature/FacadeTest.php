@@ -5,6 +5,7 @@ namespace EscolaLms\Templates\Tests\Feature;
 use BadMethodCallException;
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Settings\Models\Setting;
+use EscolaLms\Templates\Core\SettingsVariables;
 use EscolaLms\Templates\Enums\TemplateSectionTypeEnum;
 use EscolaLms\Templates\Facades\Template;
 use EscolaLms\Templates\Tests\Mock\TestChannel;
@@ -16,13 +17,18 @@ use EscolaLms\Templates\Tests\Mock\TestEventWithToArray;
 use EscolaLms\Templates\Tests\Mock\TestVariables;
 use EscolaLms\Templates\Tests\Mock\TestVariablesWithMissingDefaultContent;
 use EscolaLms\Templates\Tests\TestCase;
-use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class FacadeTest extends TestCase
 {
     use DatabaseTransactions;
     use CreatesUsers;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        SettingsVariables::clearSettings();
+    }
 
     public function testRegistering()
     {

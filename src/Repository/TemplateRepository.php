@@ -30,7 +30,7 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
 
     public function searchAndPaginate(array $search = [], ?int $perPage = null, string $orderDirection = 'asc', string $orderColumn = 'id'): LengthAwarePaginator
     {
-        return $this->allQuery($search)->orderBy($orderColumn, $orderDirection)->paginate($perPage);
+        return $this->allQuery($search)->orderBy($orderColumn, $orderDirection)->with(['sections', 'templatables'])->paginate($perPage);
     }
 
     public function deleteTemplate(int $id): bool
