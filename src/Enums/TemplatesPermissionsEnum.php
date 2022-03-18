@@ -11,4 +11,5 @@ class TemplatesPermissionsEnum extends BasicEnum
     const TEMPLATES_UPDATE = 'template_update';
     const TEMPLATES_LIST = 'template_list';
     const TEMPLATES_READ = 'template_read';
+    const EVENTS_TRIGGER = 'events_trigger';
 }

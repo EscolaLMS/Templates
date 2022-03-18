@@ -1,5 +1,6 @@
 <?php
 
+use EscolaLms\Templates\Http\Controllers\EventAdminApiController;
 use EscolaLms\Templates\Http\Controllers\TemplatesAdminApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,8 @@ Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], 
 
     Route::post('/{id}/assign', [TemplatesAdminApiController::class, 'assign']);
     Route::post('/{id}/unassign', [TemplatesAdminApiController::class, 'unassign']);
+});
+
+Route::group(['prefix' => 'api/admin/events/', 'middleware' => ['auth:api']], function () {
+    Route::post('trigger-manually', [EventAdminApiController::class, 'triggerManually']);
 });
