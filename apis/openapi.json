@@ -5,6 +5,55 @@
         "version": "0.0.1"
     },
     "paths": {
+        "/api/admin/events/trigger-manually": {
+            "post": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Manually triggered event for users",
+                "operationId": "5961633c4b68b84902f136d042e22d02",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "description": "Ids of users",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event dispatched successfully"
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "422": {
+                        "description": "one of the parameters has invalid format"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/api/admin/templates": {
             "get": {
                 "tags": [
