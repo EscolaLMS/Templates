@@ -6,10 +6,12 @@ use EscolaLms\Templates\AuthServiceProvider;
 use EscolaLms\Templates\Listeners\TemplateEventListener;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Repository\TemplateRepository;
+use EscolaLms\Templates\Services\Contracts\EventServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateEventServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
+use EscolaLms\Templates\Services\EventService;
 use EscolaLms\Templates\Services\TemplateChannelService;
 use EscolaLms\Templates\Services\TemplateEventService;
 use EscolaLms\Templates\Services\TemplateService;
@@ -28,6 +30,7 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
         TemplateRepositoryContract::class => TemplateRepository::class,
         TemplateServiceContract::class => TemplateService::class,
         TemplateVariablesServiceContract::class => TemplateVariablesService::class,
+        EventServiceContract::class => EventService::class,
     ];
 
     public function register()

@@ -24,6 +24,7 @@ class PermissionTableSeeder extends Seeder
             TemplatesPermissionsEnum::TEMPLATES_UPDATE,
             TemplatesPermissionsEnum::TEMPLATES_LIST,
             TemplatesPermissionsEnum::TEMPLATES_READ,
+            TemplatesPermissionsEnum::EVENTS_TRIGGER,
         ];
 
         foreach ($permissions as $permission) {
