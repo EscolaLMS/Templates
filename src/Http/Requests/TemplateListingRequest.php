@@ -2,9 +2,11 @@
 
 namespace EscolaLms\Templates\Http\Requests;
 
+use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class TemplateListingRequest extends FormRequest
 {
@@ -23,9 +25,11 @@ class TemplateListingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $channels = FacadesTemplate::getRegisteredChannels();
+        $events = array_keys(FacadesTemplate::getRegisteredEvents());
         return [
-            'event' => ['sometimes', 'string'],
-            'channel' => ['sometimes', 'string'],
+            'event' => ['sometimes', 'string', Rule::in($events)],
+            'channel' => ['sometimes', 'string', Rule::in($channels)],
         ];
     }
 }

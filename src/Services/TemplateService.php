@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Services;
 
 use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
+use EscolaLms\Templates\Helpers\Models;
 use EscolaLms\Templates\Models\Templatable;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
@@ -13,6 +14,7 @@ use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use RuntimeException;
 
 class TemplateService implements TemplateServiceContract
@@ -140,7 +142,8 @@ class TemplateService implements TemplateServiceContract
         }
 
         $assignable = $assignableClass::findOrFail($assignable_id);
-        Templatable::updateOrCreate(['event' => $template->event, 'channel' => $template->channel, 'templatable_type' => $assignableClass, 'templatable_id' => $assignable->getKey()], ['template_id' => $template->getKey()]);
+        assert($assignable instanceof Model);
+        Templatable::updateOrCreate(['event' => $template->event, 'channel' => $template->channel, 'templatable_type' => $assignable->getMorphClass(), 'templatable_id' => $assignable->getKey()], ['template_id' => $template->getKey()]);
 
         return $template->refresh();
     }
@@ -148,9 +151,8 @@ class TemplateService implements TemplateServiceContract
     public function unassignTemplateFromModel(Template $template, int $assignable_id): Template
     {
         $variableClass = FacadesTemplate::getVariableClassName($template->event, $template->channel);
-        $assignableClass = $variableClass::assignableClass();
 
-        Templatable::where('templatable_type', $assignableClass)->where('templatable_id', $assignable_id)->where('template_id', $template->getKey())->delete();
+        Templatable::where('templatable_type', Models::getMorphClassFromModelClass($variableClass::assignableClass()))->where('templatable_id', $assignable_id)->where('template_id', $template->getKey())->delete();
 
         return $template->refresh();
     }

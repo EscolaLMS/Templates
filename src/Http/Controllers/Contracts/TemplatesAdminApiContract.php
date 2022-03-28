@@ -453,10 +453,28 @@ interface TemplatesAdminApiContract
      *             type="string"
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         description="Class of channel for which we want to find assignable Templates",
+     *         in="query",
+     *         name="channel",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         description="Class of event for which we want to find assignable Templates",
+     *         in="query",
+     *         name="event",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of Templates that can be assigned",
-     *      ),
+     *     ),
      *     @OA\Response(
      *          response=401,
      *          description="endpoint requires authentication",

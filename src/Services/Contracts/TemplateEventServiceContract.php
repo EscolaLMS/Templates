@@ -15,5 +15,5 @@ interface TemplateEventServiceContract
     public function getRegisteredEventsWithTokens(): array;
     public function getRegisteredChannels(): array;
     public function processTemplateAfterSaving(Template $template): Template;
-    public function listAssignableTemplates(?string $assignableClass = null): Collection;
+    public function listAssignableTemplates(?string $assignableClass = null, ?string $eventClass = null, ?string $channelClass = null): Collection;
 }

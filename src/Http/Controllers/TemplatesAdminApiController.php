@@ -123,7 +123,7 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
     public function assignable(TemplateListAssignableRequest $request): Response
     {
-        $templates = FacadesTemplate::listAssignableTemplates($request->input('assignable_class'));
+        $templates = FacadesTemplate::listAssignableTemplates($request->input('assignable_class'), $request->input('event'), $request->input('channel'));
 
         return $this->sendResponseForResource(TemplateResource::collection($templates), 'List of assignable templates fetched successfully');
     }

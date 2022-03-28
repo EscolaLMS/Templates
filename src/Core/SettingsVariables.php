@@ -3,7 +3,6 @@
 namespace EscolaLms\Templates\Core;
 
 use EscolaLms\Settings\Models\Setting;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

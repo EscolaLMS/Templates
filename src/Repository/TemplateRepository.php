@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Repository;
 
 use EscolaLms\Core\Repositories\BaseRepository;
+use EscolaLms\Templates\Helpers\Models;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
@@ -55,13 +56,14 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
         ])->first();
     }
 
-    public function findTemplateAssigned(string $event, string $channel, string $assigned_class, ?int $assigned_value): ?Template
+    public function findTemplateAssigned(string $event, string $channel, string $assigned_class, int $assigned_value): ?Template
     {
-        if (is_a($assigned_class, Model::class, true) && !is_null($assigned_value)) {
+        if (is_a($assigned_class, Model::class, true)) {
             return $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
-            ])->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assigned_value)->where('templatable_type', $assigned_class))->first();
+            ])->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assigned_value)->where('templatable_type', Models::getMorphClassFromModelClass($assigned_class)))
+                ->first();
         }
         return null;
     }
@@ -92,7 +94,7 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
     public function findAllTemplatesAssigned(string $assignable_class, int $assignable_id): Collection
     {
         if (is_a($assignable_class, Model::class, true)) {
-            return $this->allQuery()->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assignable_id)->where('templatable_type', $assignable_class))->get();
+            return $this->allQuery()->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assignable_id)->where('templatable_type', Models::getMorphClassFromModelClass($assignable_class)))->get();
         }
         return Collection::empty();
     }
