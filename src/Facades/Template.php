@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static            void createDefaultTemplatesForChannel(string $channelClass)
  * @method static TemplatePreview sendPreview(\EscolaLms\Core\Models\User $user, \EscolaLms\Templates\Models\Template $template)
  * @method static   TemplateModel processTemplateAfterSaving(\EscolaLms\Templates\Models\Template $template)
- * @method static      Collection listAssignableTemplates(?string $modelClass = null)
+ * @method static      Collection listAssignableTemplates(?string $assignableClass = null, ?string $eventClass = null, ?string $channelClass = null)
  * 
  * @see \EscolaLms\Templates\Services\TemplateEventService
  */

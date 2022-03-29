@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Tests;
 
 use EscolaLms\Auth\EscolaLmsAuthServiceProvider;
+use EscolaLms\Categories\EscolaLmsCategoriesServiceProvider;
 use EscolaLms\Core\Enums\UserRole;
 use EscolaLms\Settings\EscolaLmsSettingsServiceProvider;
 use EscolaLms\Templates\Database\Seeders\PermissionTableSeeder;
@@ -25,14 +26,20 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
 
     protected function getPackageProviders($app): array
     {
-        return [
+        $providers = [
             ...parent::getPackageProviders($app),
             PassportServiceProvider::class,
             PermissionServiceProvider::class,
             EscolaLmsTemplatesServiceProvider::class,
             EscolaLmsSettingsServiceProvider::class,
-            EscolaLmsAuthServiceProvider::class
         ];
+        if (class_exists(EscolaLmsAuthServiceProvider::class)) {
+            $providers[] = EscolaLmsAuthServiceProvider::class;
+        }
+        if (class_exists(EscolaLmsCategoriesServiceProvider::class)) {
+            $providers[] = EscolaLmsCategoriesServiceProvider::class;
+        }
+        return $providers;
     }
 
     protected function getEnvironmentSetUp($app): void

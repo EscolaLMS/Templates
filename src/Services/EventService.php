@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Templates\Services;
 
-use EscolaLms\Auth\Models\User;
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Events\ManuallyTriggeredEvent;
 use EscolaLms\Templates\Services\Contracts\EventServiceContract;
 

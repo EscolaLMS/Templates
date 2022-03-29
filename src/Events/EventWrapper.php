@@ -8,6 +8,14 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 
+/**
+ * Event should have methods declared for retrieving its data, 
+ * for example Course related event should have getCourse() method, 
+ * but if it does not, we can try to extract 'course' property of the object 
+ * (either from toArray method or by using Reflection)
+ * 
+ * This wrapper exists for enabling extraction of any available data from event instance.
+ */
 class EventWrapper
 {
     use ForwardsCalls;
@@ -26,33 +34,11 @@ class EventWrapper
 
     public function user(): ?User
     {
-        try {
-            $result = $this->__call('getUser', []);
-            if ($result instanceof User) {
-                return $result;
-            }
-            if (is_numeric($result)) {
-                return User::find($result);
-            }
-        } catch (\BadMethodCallException $ex) {
-            // ignore
-        }
-        if (method_exists($this->event, 'toArray')) {
-            foreach ($this->event->toArray() as $key => $value) {
-                if ($value instanceof User) {
-                    return $value->getKey();
-                }
-            }
-        }
-        foreach ($this->extractPropertiesFromBaseEvent() as $key => $value) {
-            if ($value instanceof User) {
-                return $value->getKey();
-            }
-        }
-        return null;
+        $id = $this->extractIdForPropertyOfClass(User::class);
+        return $id ? User::find($id) : null;
     }
 
-    public function assignable(string $class): ?int
+    public function extractIdForPropertyOfClass(string $class): ?int
     {
         assert(is_a($class, Model::class, true));
         try {
@@ -82,12 +68,6 @@ class EventWrapper
         return null;
     }
 
-    /**
-     * Event should have methods declared for retrieving its data, 
-     * for example Course related event should have getCourse() method, 
-     * but if it does not, we can try to extract 'course' property of the object 
-     * (either from toArray method or by using Reflection)
-     */
     public function __call($name, $arguments)
     {
         if (Str::startsWith($name, 'get') && !method_exists($this->event, $name)) {

@@ -8,6 +8,7 @@ use EscolaLms\Templates\Core\TemplatePreview;
 use EscolaLms\Templates\Core\TemplateSectionSchema;
 use EscolaLms\Templates\Events\EventWrapper;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
+use EscolaLms\Templates\Helpers\Models;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateChannelServiceContract;
@@ -136,7 +137,8 @@ class TemplateEventService implements TemplateEventServiceContract
     {
         $template = null;
         if ($variableClass::assignableClass()) {
-            $template = $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $event->assignable($variableClass::assignableClass()));
+            $assignableId = $event->extractIdForPropertyOfClass($variableClass::assignableClass());
+            $template = is_null($assignableId) ? null : $this->repository->findTemplateAssigned($event->eventClass(), $channelClass, $variableClass::assignableClass(), $assignableId);
         }
         return $template ?? $this->repository->findTemplateDefault($event->eventClass(), $channelClass);
     }
@@ -175,15 +177,25 @@ class TemplateEventService implements TemplateEventServiceContract
         return $variableClass::processTemplateAfterSaving($channelClass::processTemplateAfterSaving($template));
     }
 
-    public function listAssignableTemplates(?string $assignableClass = null): Collection
+    public function listAssignableTemplates(?string $assignableClass = null, ?string $eventClass = null, ?string $channelClass = null): Collection
     {
+        $requiresFiltering = !is_null($assignableClass) || !is_null($eventClass) || !is_null($channelClass);
+
         $filters = [];
-        foreach ($this->events as $eventClass => $channels) {
-            foreach ($channels as $channelClass => $variableClass) {
-                if ($variableClass::assignableClass() && (is_null($assignableClass) || $variableClass::assignableClass() === $assignableClass)) {
+        if ($requiresFiltering) {
+            $events = array_filter($this->events, fn ($event, $channels) => (is_null($eventClass) || $eventClass === $event) && (is_null($channelClass) || in_array($channelClass, array_keys($channels))), ARRAY_FILTER_USE_BOTH);
+
+            foreach ($events as $event => $channels) {
+                foreach ($channels as $channel => $variableClass) {
+                    if (!is_null($channelClass) && $channel !== $channelClass) {
+                        continue;
+                    }
+                    if (!is_null($assignableClass) && Models::getMorphClassFromModelClass($variableClass::assignableClass()) !== Models::getMorphClassFromModelClass($assignableClass)) {
+                        continue;
+                    }
                     $filters[] = [
-                        'event' => $eventClass,
-                        'channel' => $channelClass
+                        'event' => $event,
+                        'channel' => $channel
                     ];
                 }
             }
@@ -195,8 +207,8 @@ class TemplateEventService implements TemplateEventServiceContract
             $query->where(fn (Builder $query) => $query->where('event', $filter['event'])->where('channel', $filter['channel']), null, null, $andor);
             $andor = 'or';
         }
-        if (!is_null($assignableClass) && empty($filters)) {
-            $query->where('id', '=', -1); // return zero results if no event/channel pair were founds for assignableClass
+        if ($requiresFiltering && empty($filters)) {
+            $query->where('id', '=', -1); // empty filter array means that nothing will match requested event/channel/assignable class
         }
         return $query->get();
     }
