@@ -34,6 +34,15 @@ class EventWrapper
 
     public function user(): ?User
     {
+        try {
+            $result = $this->__call('getUser', []);
+            if ($result instanceof User) {
+                return $result;
+            }
+        } catch (\BadMethodCallException $ex) {
+            // ignore
+        }
+
         $id = $this->extractIdForPropertyOfClass(User::class);
         return $id ? User::find($id) : null;
     }
