@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Templates\Services\Contracts;
 
+use EscolaLms\Templates\Models\Template;
+
 interface EventServiceContract
 {
-    public function dispatchEventManuallyForUsers(array $users = []): void;
+    public function dispatchEventManuallyForUsers(array $users, Template $template): void;
 }

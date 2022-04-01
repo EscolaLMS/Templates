@@ -23,5 +23,5 @@ Route::group(['prefix' => 'api/admin/templates', 'middleware' => ['auth:api']], 
 });
 
 Route::group(['prefix' => 'api/admin/events/', 'middleware' => ['auth:api']], function () {
-    Route::post('trigger-manually', [EventAdminApiController::class, 'triggerManually']);
+    Route::post('trigger-manually/{id}', [EventAdminApiController::class, 'triggerManually']);
 });

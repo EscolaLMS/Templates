@@ -19,7 +19,7 @@ class EventAdminApiController extends EscolaLmsBaseController implements EventAd
 
     public function triggerManually(EventTriggerRequest $request): JsonResponse
     {
-        $this->eventService->dispatchEventManuallyForUsers($request->get('users'));
+        $this->eventService->dispatchEventManuallyForUsers($request->get('users'), $request->getTemplate());
 
         return $this->sendSuccess(__('Event triggered successfully'));
     }
