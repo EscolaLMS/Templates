@@ -9,12 +9,21 @@ interface EventAdminApiContract
 {
     /**
      * @OA\Post(
-     *     path="/api/admin/events/trigger-manually",
+     *     path="/api/admin/events/trigger-manually/{id}",
      *     summary="Manually triggered event for users",
      *     tags={"Templates"},
      *     security={
      *         {"passport": {}},
      *     },
+     *     @OA\Parameter(
+     *         description="Template id",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
      *     @OA\RequestBody(
      *          @OA\JsonContent(
      *              @OA\Property(

@@ -3,6 +3,7 @@
 namespace EscolaLms\Templates\Http\Requests;
 
 use EscolaLms\Templates\Enums\TemplatesPermissionsEnum;
+use EscolaLms\Templates\Models\Template;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EventTriggerRequest extends FormRequest
@@ -20,5 +21,10 @@ class EventTriggerRequest extends FormRequest
             'users' => ['required', 'array'],
             'users.*' => ['integer', 'exists:users,id'],
         ];
+    }
+
+    public function getTemplate(): ?Template
+    {
+        return Template::findOrFail($this->route('id'));
     }
 }
