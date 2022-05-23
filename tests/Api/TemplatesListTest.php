@@ -58,6 +58,26 @@ class TemplatesListTest extends TestCase
         );
     }
 
+    public function testAdminCanListWithPerPage(): void
+    {
+        $this->authenticateAsAdmin();
+
+        $templates = Template::factory()
+            ->count(10)
+            ->create();
+
+        $templatesArr = $templates->map(function (Template $p) {
+            return $p->toArray();
+        })->toArray();
+
+        $response = $this->actingAs($this->user, 'api')->getJson('/api/admin/templates/?per_page=5');
+        $response->assertOk();
+        $response->assertJsonCount(5, 'data');
+        $response->assertJsonFragment(
+            $templatesArr[0],
+        );
+    }
+
     public function testGuestCannotList(): void
     {
         $response = $this->getJson('/api/admin/templates');

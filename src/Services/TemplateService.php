@@ -30,9 +30,9 @@ class TemplateService implements TemplateServiceContract
         $this->variableService = $variableService;
     }
 
-    public function search(array $search = []): LengthAwarePaginator
+    public function search(array $search = [], ?int $perPage = null): LengthAwarePaginator
     {
-        return $this->repository->searchAndPaginate($search);
+        return $this->repository->searchAndPaginate($search, $perPage);
     }
 
     public function getById(int $id): Template
