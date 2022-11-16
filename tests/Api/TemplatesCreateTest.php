@@ -22,6 +22,11 @@ class TemplatesCreateTest extends TestCase
         FacadesTemplate::register(TestEventWithGetters::class, TestChannel::class, TestVariables::class);
     }
 
+    private function convertToAlternativeFormat(string $varname): string
+    {
+        return '$' . "{" . str_replace("@", "", $varname) . "}";
+    }
+
     private function uri(string $suffix): string
     {
         return sprintf('/api/admin/templates%s', $suffix);
@@ -53,6 +58,32 @@ class TemplatesCreateTest extends TestCase
         );
 
         $response2->assertOk();
+    }
+
+
+
+    public function testAdminCanCreateTemplateAlternativeFormat(): void
+    {
+        $this->authenticateAsAdmin();
+        $template = Template::factory()->makeOne();
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
+
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+            TemplateSection::factory(['key' => 'content', 'content' => $this->convertToAlternativeFormat(TestVariables::VAR_USER_EMAIL) . '_'])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge($template->toArray(), ['sections' => $sections]);
+
+        $response = $this->actingAs($this->user, 'api')->postJson(
+            '/api/admin/templates',
+            $data
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('sections');
+        $response->assertJsonValidationErrors(['sections' => 'Required variables in section: content [@VarFriendEmail]']);
     }
 
     public function testAdminCannotCreateTemplateWithoutTitle(): void
@@ -110,6 +141,31 @@ class TemplatesCreateTest extends TestCase
     }
 
     public function testAdminCannotCreateTemplateWithMissingVariablesInSection(): void
+    {
+        $this->authenticateAsAdmin();
+        $template = Template::factory()->makeOne();
+        $template->event = TestEventWithGetters::class;
+        $template->channel = TestChannel::class;
+
+        $sections = [
+            TemplateSection::factory(['key' => 'title'])->makeOne()->toArray(),
+            TemplateSection::factory(['key' => 'content'])->makeOne()->toArray(),
+        ];
+
+        $data = array_merge($template->toArray(), ['sections' => $sections]);
+
+        /** @var TestResponse $response */
+        $response = $this->actingAs($this->user, 'api')->postJson(
+            '/api/admin/templates',
+            $data
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('sections');
+        $response->assertJsonValidationErrors(['sections' => 'Required variables in section: content [@VarUserEmail, @VarFriendEmail]']);
+    }
+
+    public function testAdminCannotCreateTemplateWithMissingVariablesInSectionAlterativeFormatting(): void
     {
         $this->authenticateAsAdmin();
         $template = Template::factory()->makeOne();
