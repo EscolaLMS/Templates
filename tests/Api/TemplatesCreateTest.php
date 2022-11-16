@@ -24,7 +24,7 @@ class TemplatesCreateTest extends TestCase
 
     private function convertToAlternativeFormat(string $varname): string
     {
-        return "{" . str_replace("@", "", $varname) . "}";
+        return '$' . "{" . str_replace("@", "", $varname) . "}";
     }
 
     private function uri(string $suffix): string
