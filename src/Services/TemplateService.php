@@ -11,6 +11,7 @@ use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
+use EscolaLms\Templates\Services\TemplateVariablesService;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -112,10 +113,18 @@ class TemplateService implements TemplateServiceContract
 
     public function generateContentUsingVariables(Template $template, array $variables): array
     {
+
+
         $results = [];
         foreach ($template->sections as $section) {
             /** @var TemplateSection $section */
-            $results[$section->key] = strtr($section->content, $variables);
+            $allVariables = [];
+            foreach ($variables as $key => $variable) {
+                foreach (TemplateVariablesService::convertVarNameToAllFormats($key) as $nKey) {
+                    $allVariables[$nKey] = $variable;
+                }
+            }
+            $results[$section->key] = strtr($section->content, $allVariables);
         }
         return $results;
     }
