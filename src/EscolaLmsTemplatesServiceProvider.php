@@ -46,6 +46,7 @@ class EscolaLmsTemplatesServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'template');
         $this->extendResources();
     }
 
