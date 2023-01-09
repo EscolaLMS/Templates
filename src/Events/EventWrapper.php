@@ -9,11 +9,11 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 
 /**
- * Event should have methods declared for retrieving its data, 
- * for example Course related event should have getCourse() method, 
- * but if it does not, we can try to extract 'course' property of the object 
+ * Event should have methods declared for retrieving its data,
+ * for example Course related event should have getCourse() method,
+ * but if it does not, we can try to extract 'course' property of the object
  * (either from toArray method or by using Reflection)
- * 
+ *
  * This wrapper exists for enabling extraction of any available data from event instance.
  */
 class EventWrapper
@@ -45,6 +45,18 @@ class EventWrapper
 
         $id = $this->extractIdForPropertyOfClass(User::class);
         return $id ? User::find($id) : null;
+    }
+
+    public function getEmail(): ?string
+    {
+        try {
+
+            return $this->__call('getEmail', []);
+        } catch (\BadMethodCallException $ex) {
+            // ignore
+        }
+
+        return null;
     }
 
     public function extractIdForPropertyOfClass(string $class): ?int
