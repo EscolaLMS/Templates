@@ -5,6 +5,7 @@ namespace EscolaLms\Templates;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Policies\TemplatePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -15,5 +16,8 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+        if (!$this->app->routesAreCached()) {
+            Passport::routes();
+        }
     }
 }
