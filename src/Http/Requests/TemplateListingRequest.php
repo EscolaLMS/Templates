@@ -30,6 +30,12 @@ class TemplateListingRequest extends FormRequest
         return [
             'event' => ['sometimes', 'string', Rule::in($events)],
             'channel' => ['sometimes', 'string', Rule::in($channels)],
+            'per_page' => ['sometimes', 'nullable', 'integer'],
         ];
+    }
+
+    public function getPerPage(): ?int
+    {
+        return $this->input('per_page');
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface TemplateServiceContract
 {
-    public function search(array $search = []): LengthAwarePaginator;
+    public function search(array $search = [], ?int $perPage = null): LengthAwarePaginator;
 
     public function getById(int $id): Template;
 

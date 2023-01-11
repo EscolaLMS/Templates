@@ -64,7 +64,14 @@ class TemplateVariablesService implements TemplateVariablesServiceContract
             return false;
         }
 
-        return Str::containsAll($content, $variableClass::requiredVariablesInSection($section));
+        return collect($variableClass::requiredVariablesInSection($section))
+            ->every(fn ($variable) => collect(self::convertVarNameToAllFormats($variable))
+                ->contains(fn ($var) => Str::contains($content, $var)));
+    }
+
+    public static function convertVarNameToAllFormats(string $varname): array
+    {
+        return [$varname,  '$' . "{" . str_replace("@", "", $varname) . "}"];
     }
 
     public function missingVariablesInSection(string $variableClass, string $section, string $content): array
@@ -73,7 +80,11 @@ class TemplateVariablesService implements TemplateVariablesServiceContract
             return [];
         }
 
-        return array_filter($variableClass::requiredVariablesInSection($section), fn ($variable) => !Str::contains($content, $variable));
+        return array_filter(
+            $variableClass::requiredVariablesInSection($section),
+            fn ($variable) =>
+            !collect(self::convertVarNameToAllFormats($variable))->contains(fn ($var) => Str::contains($content, $var))
+        );
     }
 
     public function contentIsValidForChannel(string $variableClass, string $channelClass, string $content): bool
@@ -85,7 +96,11 @@ class TemplateVariablesService implements TemplateVariablesServiceContract
             return false;
         }
 
-        return Str::containsAll($content, $this->requiredVariablesForChannel($variableClass, $channelClass));
+        return collect($this->requiredVariablesForChannel($variableClass, $channelClass))
+            ->every(fn ($variable) => collect(self::convertVarNameToAllFormats($variable))
+                ->contains(fn ($var) => Str::contains($content, $var)));
+
+        // return Str::containsAll($content, $this->requiredVariablesForChannel($variableClass, $channelClass));
     }
 
     public function requiredSectionsForChannel(string $variableClass, string $channelClass): array
