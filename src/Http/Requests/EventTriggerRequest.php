@@ -20,6 +20,7 @@ class EventTriggerRequest extends FormRequest
         return [
             'users' => ['required', 'array'],
             'users.*' => ['integer', 'exists:users,id'],
+            'course' => ['nullable', 'exists:courses,id'],
         ];
     }
 
