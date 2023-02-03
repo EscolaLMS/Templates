@@ -6,5 +6,5 @@ use EscolaLms\Templates\Models\Template;
 
 interface EventServiceContract
 {
-    public function dispatchEventManuallyForUsers(array $users, Template $template): bool;
+    public function dispatchEventManuallyForUsers(array $users, Template $template, int $courseId = null): bool;
 }

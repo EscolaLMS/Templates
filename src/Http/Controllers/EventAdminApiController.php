@@ -25,7 +25,7 @@ class EventAdminApiController extends EscolaLmsBaseController implements EventAd
             return $this->sendError(__('Template is invalid.'), 400);
         }
 
-        $this->eventService->dispatchEventManuallyForUsers($request->get('users'), $template);
+        $this->eventService->dispatchEventManuallyForUsers($request->get('users'), $template, $request->input('course'));
 
         return $this->sendSuccess(__('Event triggered successfully'));
     }
