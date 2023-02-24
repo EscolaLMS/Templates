@@ -21,6 +21,7 @@ class EventTriggerRequest extends FormRequest
             'users' => ['required', 'array'],
             'users.*' => ['integer', 'exists:users,id'],
             'course' => ['nullable', 'exists:courses,id'],
+            'product' => ['nullable', 'exists:products,id'],
         ];
     }
 
