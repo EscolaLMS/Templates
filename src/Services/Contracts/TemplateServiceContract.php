@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Templates\Services\Contracts;
 
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Dtos\TemplateFilterCriteriaDto;
 use EscolaLms\Templates\Models\Template;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +13,7 @@ interface TemplateServiceContract
 {
     public function search(array $search = [], ?int $perPage = null): LengthAwarePaginator;
 
+    public function list(TemplateFilterCriteriaDto $criteria, OrderDto $orderDto, ?int $perPage = null): LengthAwarePaginator;
     public function getById(int $id): Template;
 
     public function deleteById(int $id): bool;
