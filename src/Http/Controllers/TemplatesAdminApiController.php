@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Templates\Http\Controllers;
 
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Templates\Dtos\TemplateFilterCriteriaDto;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Http\Controllers\Contracts\TemplatesAdminApiContract;
 use EscolaLms\Templates\Http\Requests\TemplateAssignedRequest;
@@ -32,8 +34,12 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
 
     public function list(TemplateListingRequest $request): JsonResponse
     {
-        $search = $request->only(['event', 'channel']);
-        $templates = $this->templateService->search($search, $request->getPerPage());
+        $templates = $this->templateService->list(
+            TemplateFilterCriteriaDto::instantiateFromRequest($request),
+            OrderDto::instantiateFromRequest($request),
+            $request->getPerPage(),
+        );
+
         return $this->sendResponseForResource(TemplateResource::collection($templates), "templates list retrieved successfully");
     }
 

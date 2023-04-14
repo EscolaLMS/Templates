@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Templates\Services;
 
+use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Dtos\TemplateFilterCriteriaDto;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Helpers\Models;
 use EscolaLms\Templates\Models\Templatable;
@@ -11,7 +13,6 @@ use EscolaLms\Templates\Models\TemplateSection;
 use EscolaLms\Templates\Repository\Contracts\TemplateRepositoryContract;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
 use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
-use EscolaLms\Templates\Services\TemplateVariablesService;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,9 +25,10 @@ class TemplateService implements TemplateServiceContract
     protected TemplateVariablesServiceContract $variableService;
 
     public function __construct(
-        TemplateRepositoryContract $repository,
+        TemplateRepositoryContract       $repository,
         TemplateVariablesServiceContract $variableService
-    ) {
+    )
+    {
         $this->repository = $repository;
         $this->variableService = $variableService;
     }
@@ -34,6 +36,14 @@ class TemplateService implements TemplateServiceContract
     public function search(array $search = [], ?int $perPage = null): LengthAwarePaginator
     {
         return $this->repository->searchAndPaginate($search, $perPage);
+    }
+
+    public function list(TemplateFilterCriteriaDto $criteria, OrderDto $orderDto, ?int $perPage = null): LengthAwarePaginator
+    {
+        return $this->repository
+            ->queryWithAppliedCriteria($criteria->toArray())
+            ->orderBy($orderDto->getOrderBy() ?? 'created_at', $orderDto->getOrder() ?? 'desc')
+            ->paginate($perPage ?? 15);
     }
 
     public function getById(int $id): Template
@@ -69,7 +79,7 @@ class TemplateService implements TemplateServiceContract
             unset($data['sections']);
             $template = $this->repository->updateWithSections($data, $sections, $id);
         } else {
-            $template =  $this->repository->update($data, $id);
+            $template = $this->repository->update($data, $id);
         }
         return FacadesTemplate::processTemplateAfterSaving($template);
     }

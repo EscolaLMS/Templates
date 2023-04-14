@@ -3,6 +3,8 @@
 namespace EscolaLms\Templates\Tests\Api;
 
 use EscolaLms\Core\Models\User;
+use EscolaLms\Templates\Contracts\TemplateChannelContract;
+use EscolaLms\Templates\Contracts\TemplateVariableContract;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Tests\Mock\TestChannel;
@@ -93,12 +95,15 @@ class TemplatesListTest extends TestCase
             ->count(9)
             ->create();
 
+
         $template = Template::factory()->create([
+            'name' => 'test one',
             'event' => TestEventWithGettersAndToArray::class,
             'channel' => TestChannel::class
         ]);
 
         $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'name' => 'one',
             'event' => TestEventWithGettersAndToArray::class,
             'channel' => TestChannel::class,
         ]);
@@ -118,5 +123,106 @@ class TemplatesListTest extends TestCase
                 )
             ]
         ]);
+    }
+
+    public function testAdminCanListWithSorts()
+    {
+        $this->authenticateAsAdmin();
+
+        $templateOne = Template::factory()->create([
+            'name' => 'first test',
+            'channel' => TemplateChannelContract::class,
+            'event' => TemplateVariableContract::class,
+            'created_at' => now()->subDay(),
+            'default' => false,
+        ]);
+
+        $templateTwo = Template::factory()->create([
+            'name' => 'second test',
+            'event' => TestEventWithGettersAndToArray::class,
+            'channel' => TestChannel::class,
+            'created_at' => now()->addDay(),
+            'default' => true,
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'created_at',
+            'order' => 'desc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'created_at',
+            'order' => 'asc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'name',
+            'order' => 'desc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'name',
+            'order' => 'asc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'default',
+            'order' => 'desc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'default',
+            'order' => 'asc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'event',
+            'order' => 'desc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'event',
+            'order' => 'asc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateTwo->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'channel',
+            'order' => 'desc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateTwo->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateOne->getKey());
+
+        $response = $this->actingAs($this->user, 'api')->json('GET', '/api/admin/templates', [
+            'order_by' => 'channel',
+            'order' => 'asc'
+        ]);
+
+        $this->assertTrue($response->json('data.0.id') === $templateOne->getKey());
+        $this->assertTrue($response->json('data.1.id') === $templateTwo->getKey());
     }
 }

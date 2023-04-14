@@ -30,7 +30,9 @@ class TemplateListingRequest extends FormRequest
         return [
             'event' => ['sometimes', 'string', Rule::in($events)],
             'channel' => ['sometimes', 'string', Rule::in($channels)],
+            'name' => ['sometimes', 'string'],
             'per_page' => ['sometimes', 'nullable', 'integer'],
+            'order_by' => ['sometimes', 'nullable', 'string', 'in:id,created_at,name,event,default,channel'],
         ];
     }
 
