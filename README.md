@@ -20,7 +20,7 @@ Each template is defined by
 
 For every channel & event pair a single Variables definition is registered, which contains tokens that can be used in the template and replaced with values based on the data from the Event.
 
-Analysing these three example files in [tests](tests/Mock):
+Analysing these three example files in [tests](https://github.com/EscolaLMS/Templates/tree/main/tests/Mock):
 
 - TestChannel.php
 - TestVariables.php
@@ -43,8 +43,8 @@ To register Event-Channel-Variable set, `Template::register($eventClass, $channe
 This package has no Channels or Variables defined, everything should be created in separate packages.
 
 - [Templates-Email](https://github.com/EscolaLMS/Templates-Email)
-- [Templates-Certificates](https://github.com/EscolaLMS/Templates-Certificates)
 - [Templates-Pdf](https://github.com/EscolaLMS/Templates-Pdf)
+- [Templates-Sms](https://github.com/EscolaLMS/Templates-SMS)
 
 ### Event Wrapper
 
@@ -56,7 +56,7 @@ All the endpoints are defined in [![swagger](https://img.shields.io/badge/docume
 
 ## Tests
 
-Run `./vendor/bin/phpunit --filter 'EscolaLms\\Templates\\Tests'` to run tests. See [tests](tests) folder as it's quite good staring point as documentation appendix.
+Run `./vendor/bin/phpunit --filter 'EscolaLms\\Templates\\Tests'` to run tests. See [tests](https://github.com/EscolaLMS/Templates/tree/main/tests) folder as it's quite good staring point as documentation appendix.
 
 Test details:
 [![codecov](https://codecov.io/gh/EscolaLMS/Templates/branch/main/graph/badge.svg?token=NRAN4R8AGZ)](https://codecov.io/gh/EscolaLMS/Templates)
@@ -65,29 +65,3 @@ Test details:
 ## Listeners
 
 - `EscolaLms\Templates\Listeners\TemplateEventListener` this listeners listens to all `EscolaLms` namespace events, checks if event is registered for any Template, and passes the event wrapped in `EventWrapper` to processing (so if event is registered and has corresponding Template, notification using that Template will be sent)
-
-## Usage on front end
-
-### Admin panel
-
-These screens will only be available if at least one Template is registered (for example any package implementing Channel and Variables is installed).
-
-#### **Left menu**
-
-![Menu](docs/menu.png "Menu")
-
-#### **List of templates**
-
-![List of templates](docs/list.png "List of templates")
-
-#### **Creating/editing template**
-
-![Creating/editing template](docs/edit.png "Creating or editing template")
-
-## Permissions
-
-Permissions are defined in [Enum](src/Enums/TemplatesPermissionsEnum.php) and seeded in [Seeder](database/seeders/PermissionTableSeeder.php).
-
-## Roadmap. Todo. Troubleshooting
-
-- ???
