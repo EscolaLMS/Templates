@@ -65,3 +65,7 @@ Test details:
 ## Listeners
 
 - `EscolaLms\Templates\Listeners\TemplateEventListener` this listeners listens to all `EscolaLms` namespace events, checks if event is registered for any Template, and passes the event wrapped in `EventWrapper` to processing (so if event is registered and has corresponding Template, notification using that Template will be sent)
+
+## Permissions
+
+Permissions are defined in [Enum](https://github.com/EscolaLMS/Templates/blob/main/src/Enums/TemplatesPermissionsEnum.php) and seeded in [Seeder](https://github.com/EscolaLMS/Templates/blob/main/database/seeders/PermissionTableSeeder.php).
