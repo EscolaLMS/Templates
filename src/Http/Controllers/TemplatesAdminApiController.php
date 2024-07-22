@@ -19,7 +19,6 @@ use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Resources\TemplateResource;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
-use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -27,12 +26,10 @@ use Throwable;
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
-    private TemplateVariablesServiceContract $variablesService;
 
-    public function __construct(TemplateServiceContract $templateService, TemplateVariablesServiceContract $variablesService)
+    public function __construct(TemplateServiceContract $templateService)
     {
         $this->templateService = $templateService;
-        $this->variablesService = $variablesService;
     }
 
     public function list(TemplateListingRequest $request): JsonResponse

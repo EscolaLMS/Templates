@@ -77,12 +77,14 @@ class TemplateService implements TemplateServiceContract
     public function update(int $id, array $data): Template
     {
         if (array_key_exists('sections', $data) && !empty($data['sections'])) {
+            $sections = [];
             foreach ($data['sections'] as $section) {
                 $sections[$section['key']] = $section['content'];
             }
             unset($data['sections']);
             $template = $this->repository->updateWithSections($data, $sections, $id);
         } else {
+            /** @var Template $template */
             $template = $this->repository->update($data, $id);
         }
         return FacadesTemplate::processTemplateAfterSaving($template);

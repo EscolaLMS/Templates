@@ -25,7 +25,7 @@ class TemplateSectionSchema implements ArrayAccess
         return property_exists($this, $offset);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if ($this->offsetExists($offset)) {
             return $this->{$offset};
