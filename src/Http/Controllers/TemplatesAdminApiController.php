@@ -4,6 +4,7 @@ namespace EscolaLms\Templates\Http\Controllers;
 
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Core\Models\User;
 use EscolaLms\Templates\Dtos\TemplateFilterCriteriaDto;
 use EscolaLms\Templates\Facades\Template as FacadesTemplate;
 use EscolaLms\Templates\Http\Controllers\Contracts\TemplatesAdminApiContract;
@@ -18,18 +19,17 @@ use EscolaLms\Templates\Http\Requests\TemplateUpdateRequest;
 use EscolaLms\Templates\Http\Resources\TemplateResource;
 use EscolaLms\Templates\Models\Template;
 use EscolaLms\Templates\Services\Contracts\TemplateServiceContract;
-use EscolaLms\Templates\Services\Contracts\TemplateVariablesServiceContract;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class TemplatesAdminApiController extends EscolaLmsBaseController implements TemplatesAdminApiContract
 {
     private TemplateServiceContract $templateService;
 
-    public function __construct(TemplateServiceContract $templateService, TemplateVariablesServiceContract $variablesService)
+    public function __construct(TemplateServiceContract $templateService)
     {
         $this->templateService = $templateService;
-        $this->variablesService = $variablesService;
     }
 
     public function list(TemplateListingRequest $request): JsonResponse
@@ -53,11 +53,13 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     {
         $input = $request->all();
 
-        $updated = $this->templateService->update($id, $input);
-        if (!$updated) {
+        try {
+            $updated = $this->templateService->update($id, $input);
+
+            return $this->sendResponse($updated, "template updated successfully");
+        } catch (Throwable $e) {
             return $this->sendError(sprintf("template id '%s' doesn't exists", $id), 404);
         }
-        return $this->sendResponse($updated, "template updated successfully");
     }
 
     public function delete(TemplateDeleteRequest $request, int $id): JsonResponse
@@ -96,7 +98,9 @@ class TemplatesAdminApiController extends EscolaLmsBaseController implements Tem
     {
         $template = Template::findOrFail($id);
 
-        $preview = FacadesTemplate::sendPreview($request->user(), $template);
+        /** @var User $user */
+        $user = $request->user();
+        $preview = FacadesTemplate::sendPreview($user, $template);
 
         return $this->sendResponse($preview->toArray(), "template preview fetched successfully");
     }

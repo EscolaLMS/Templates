@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property int $templatable_id
+ * @property string $templatable_type
+ */
 class Templatable extends Model
 {
     use HasFactory;

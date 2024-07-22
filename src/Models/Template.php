@@ -39,6 +39,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *          type="bool"
  *      ),
  * )
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $channel
+ * @property string $event
+ * @property bool $default
  */
 class Template extends Model
 {

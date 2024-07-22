@@ -64,23 +64,23 @@ class TemplateChannelService implements TemplateChannelServiceContract
                 continue;
             }
             switch ($sectionSchema->getType()) {
-                case TemplateSectionTypeEnum::SECTION_HTML():
-                case TemplateSectionTypeEnum::SECTION_MJML():
+                case TemplateSectionTypeEnum::SECTION_HTML:
+                case TemplateSectionTypeEnum::SECTION_MJML:
                     if ($content === strip_tags($content)) {
                         $this->sectionValidationErrors[] = __(':section must contain HTML/MJML', ['section' => $section]);
                     }
                     break;
-                case TemplateSectionTypeEnum::SECTION_TEXT():
+                case TemplateSectionTypeEnum::SECTION_TEXT:
                     if ($content !== strip_tags($content)) {
                         $this->sectionValidationErrors[] = __(':section must not contain HTML/MJML', ['section' => $section]);
                     }
                     break;
-                case TemplateSectionTypeEnum::SECTION_URL():
+                case TemplateSectionTypeEnum::SECTION_URL:
                     if (!filter_var($content, FILTER_VALIDATE_URL)) {
                         $this->sectionValidationErrors[] = __(':section must be valid url', ['section' => $section]);
                     }
                     break;
-                case TemplateSectionTypeEnum::SECTION_FABRIC();
+                case TemplateSectionTypeEnum::SECTION_FABRIC;
                     if (!$this->isJson($content)) {
                         $this->sectionValidationErrors[] = __(':section must be valid JSON', ['section' => $section]);
                     }

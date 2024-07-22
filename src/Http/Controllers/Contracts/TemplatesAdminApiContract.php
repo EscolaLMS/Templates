@@ -251,7 +251,7 @@ interface TemplatesAdminApiContract
      *      ),
      * )
      *
-     * @param TemplateListingRequest $request
+     * @param TemplateReadRequest $request
      * @return JsonResponse
      */
     public function read(TemplateReadRequest $request, int $id): JsonResponse;
@@ -292,7 +292,7 @@ interface TemplatesAdminApiContract
      *      ),
      * )
      *
-     * @param TemplateListingRequest $request
+     * @param TemplateReadRequest $request
      * @return JsonResponse
      */
     public function variables(TemplateReadRequest $request): JsonResponse;
@@ -333,7 +333,7 @@ interface TemplatesAdminApiContract
      *      ),
      * )
      *
-     * @param TemplateListingRequest $request
+     * @param TemplateReadRequest $request
      * @return Response
      */
     public function preview(TemplateReadRequest $request, int $id): Response;
@@ -489,7 +489,7 @@ interface TemplatesAdminApiContract
      *      ),
      * )
      *
-     * @param TemplateAssignedRequest $request
+     * @param TemplateListAssignableRequest $request
      * @return Response
      */
     public function assignable(TemplateListAssignableRequest $request): Response;

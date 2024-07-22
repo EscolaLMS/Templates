@@ -14,7 +14,7 @@ interface TemplateServiceContract
     public function search(array $search = [], ?int $perPage = null): LengthAwarePaginator;
 
     public function list(TemplateFilterCriteriaDto $criteria, OrderDto $orderDto, ?int $perPage = null): LengthAwarePaginator;
-    public function getById(int $id): Template;
+    public function getById(int $id): ?Template;
 
     public function deleteById(int $id): bool;
 
