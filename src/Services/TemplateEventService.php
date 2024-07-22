@@ -183,6 +183,7 @@ class TemplateEventService implements TemplateEventServiceContract
 
         $filters = [];
         if ($requiresFiltering) {
+            // @phpstan-ignore-next-line
             $events = array_filter($this->events, fn ($event, $channels) => (is_null($eventClass) || $eventClass === $event) && (is_null($channelClass) || in_array($channelClass, array_keys($channels))), ARRAY_FILTER_USE_BOTH);
 
             foreach ($events as $event => $channels) {

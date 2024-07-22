@@ -46,20 +46,24 @@ class TemplateService implements TemplateServiceContract
             ->paginate($perPage ?? 15);
     }
 
-    public function getById(int $id): Template
+    public function getById(int $id): ?Template
     {
-        return $this->repository->find($id);
+        /** @var Template|null $result */
+        $result = $this->repository->find($id);
+        return $result;
     }
 
     public function insert(array $data): Template
     {
         if (array_key_exists('sections', $data) && !empty($data['sections'])) {
+            $sections = [];
             foreach ($data['sections'] as $section) {
                 $sections[$section['key']] = $section['content'];
             }
             unset($data['sections']);
             $template = $this->repository->createWithSections($data, $sections);
         } else {
+            /** @var Template $template */
             $template = $this->repository->create($data);
         }
         return FacadesTemplate::processTemplateAfterSaving($template);

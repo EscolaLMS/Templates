@@ -21,7 +21,9 @@ class EventService implements EventServiceContract
             return false;
         }
 
+        /** @var Course|null $course */
         $course = Course::find($courseId);
+        /** @var Product|null $product */
         $product = Product::find($productId);
 
         foreach ($users as $user) {

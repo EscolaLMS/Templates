@@ -36,7 +36,7 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
 
     public function deleteTemplate(int $id): bool
     {
-        /** @var Template $template */
+        /** @var Template|null $template */
         $template = $this->find($id);
 
         if (!$template) {
@@ -49,21 +49,27 @@ class TemplateRepository extends BaseRepository implements TemplateRepositoryCon
 
     public function findTemplateDefault(string $event, string $channel): ?Template
     {
-        return $this->allQuery([
+        /** @var Template|null $result */
+        $result = $this->allQuery([
             'event' => $event,
             'channel' => $channel,
             'default' => true,
         ])->first();
+
+        return $result;
     }
 
     public function findTemplateAssigned(string $event, string $channel, string $assigned_class, int $assigned_value): ?Template
     {
         if (is_a($assigned_class, Model::class, true)) {
-            return $this->allQuery([
+            /** @var Template|null $result */
+            $result = $this->allQuery([
                 'event' => $event,
                 'channel' => $channel,
             ])->whereHas('templatables', fn (Builder $query) => $query->where('templatable_id', $assigned_value)->where('templatable_type', Models::getMorphClassFromModelClass($assigned_class)))
                 ->first();
+
+            return $result;
         }
         return null;
     }
